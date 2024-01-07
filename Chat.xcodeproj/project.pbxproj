@@ -55,6 +55,9 @@
 		9D3043872B4AAB23005C16C5 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043862B4AAB23005C16C5 /* ProfileViewController.swift */; };
 		9D3043892B4AC03E005C16C5 /* NewConversationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043882B4AC03E005C16C5 /* NewConversationCell.swift */; };
 		9D30438B2B4AC17B005C16C5 /* NewConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30438A2B4AC17B005C16C5 /* NewConversationViewController.swift */; };
+		9D30438D2B4ACDCD005C16C5 /* MessageCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30438C2B4ACDCD005C16C5 /* MessageCell.swift */; };
+		9D30438F2B4ADF62005C16C5 /* LocationPickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30438E2B4ADF62005C16C5 /* LocationPickerVC.swift */; };
+		9D3043912B4AE1CC005C16C5 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043902B4AE1CC005C16C5 /* PhotoViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +84,9 @@
 		9D3043862B4AAB23005C16C5 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		9D3043882B4AC03E005C16C5 /* NewConversationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationCell.swift; sourceTree = "<group>"; };
 		9D30438A2B4AC17B005C16C5 /* NewConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewController.swift; sourceTree = "<group>"; };
+		9D30438C2B4ACDCD005C16C5 /* MessageCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageCell.swift; sourceTree = "<group>"; };
+		9D30438E2B4ADF62005C16C5 /* LocationPickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerVC.swift; sourceTree = "<group>"; };
+		9D3043902B4AE1CC005C16C5 /* PhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +215,7 @@
 			children = (
 				9D30437B2B4A9663005C16C5 /* ConversationCell.swift */,
 				9D3043882B4AC03E005C16C5 /* NewConversationCell.swift */,
+				9D30438C2B4ACDCD005C16C5 /* MessageCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -226,6 +233,8 @@
 			children = (
 				9D3043832B4AA68A005C16C5 /* ChatViewController.swift */,
 				9D30438A2B4AC17B005C16C5 /* NewConversationViewController.swift */,
+				9D30438E2B4ADF62005C16C5 /* LocationPickerVC.swift */,
+				9D3043902B4AE1CC005C16C5 /* PhotoViewController.swift */,
 			);
 			path = ChatViews;
 			sourceTree = "<group>";
@@ -342,6 +351,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9D30437E2B4A96BC005C16C5 /* CacheManager.swift in Sources */,
+				9D30438F2B4ADF62005C16C5 /* LocationPickerVC.swift in Sources */,
 				9D3043722B4A731F005C16C5 /* Strings+Extensions.swift in Sources */,
 				9D30431D2B4A433D005C16C5 /* HomeViewController.swift in Sources */,
 				9D3043192B4A433D005C16C5 /* AppDelegate.swift in Sources */,
@@ -351,6 +361,8 @@
 				9D3043872B4AAB23005C16C5 /* ProfileViewController.swift in Sources */,
 				9D30431B2B4A433D005C16C5 /* SceneDelegate.swift in Sources */,
 				9D3043812B4A9ACC005C16C5 /* ConversationViewModel.swift in Sources */,
+				9D3043912B4AE1CC005C16C5 /* PhotoViewController.swift in Sources */,
+				9D30438D2B4ACDCD005C16C5 /* MessageCell.swift in Sources */,
 				9D3043692B4A5026005C16C5 /* RegisterViewController.swift in Sources */,
 				9D3043772B4A7E42005C16C5 /* StorageManager.swift in Sources */,
 				9D30437C2B4A9663005C16C5 /* ConversationCell.swift in Sources */,
