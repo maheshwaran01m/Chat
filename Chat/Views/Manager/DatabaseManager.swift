@@ -8,6 +8,8 @@
 import Foundation
 import FirebaseAuth
 import FirebaseDatabase
+import CoreLocation
+import UIKit
 
 class DatabaseManager {
   
@@ -226,37 +228,37 @@ extension DatabaseManager {
 extension DatabaseManager {
   
   func conversationExist(with targetRecipientEmail: String, completion: @escaping (Result<String, Error>)-> Void){
-      
-      let safeRecipientEmail = safeEmail(targetRecipientEmail)
-      guard let senderEmail = UserDefaults.standard.value(forKey: "email") as? String else {
-          return
+    
+    let safeRecipientEmail = safeEmail(targetRecipientEmail)
+    guard let senderEmail = UserDefaults.standard.value(forKey: "email") as? String else {
+      return
+    }
+    let safeSenderEmail = safeEmail(senderEmail)
+    
+    manager.child("\(safeRecipientEmail)").observeSingleEvent(of: .value, with: { snapshot in
+      guard let collection = snapshot.value as? [[String: Any]] else {
+        completion(.failure(URLError(.cancelled)))
+        return
       }
-      let safeSenderEmail = safeEmail(senderEmail)
       
-      manager.child("\(safeRecipientEmail)").observeSingleEvent(of: .value, with: { snapshot in
-          guard let collection = snapshot.value as? [[String: Any]] else {
-            completion(.failure(URLError(.cancelled)))
-              return
-          }
-          
-          //iterate and find conversation with target
-          if let conversation = collection.first(where: {
-              guard let targetSenderEmail = $0["other_user_email"] as? String else{
-                  return false
-              }
-              return safeSenderEmail == targetSenderEmail
-          }){
-             //get id
-              guard let id = conversation["id"] as? String else {
-                  completion(.failure(URLError(.cancelled)))
-                  return
-              }
-              completion(.success(id))
-              return
-          }
+      //iterate and find conversation with target
+      if let conversation = collection.first(where: {
+        guard let targetSenderEmail = $0["other_user_email"] as? String else{
+          return false
+        }
+        return safeSenderEmail == targetSenderEmail
+      }){
+        //get id
+        guard let id = conversation["id"] as? String else {
           completion(.failure(URLError(.cancelled)))
           return
-      })
+        }
+        completion(.success(id))
+        return
+      }
+      completion(.failure(URLError(.cancelled)))
+      return
+    })
   }
 }
 
@@ -320,4 +322,518 @@ extension DatabaseManager {
   enum DatabaseError: Error {
     case failedToFetch
   }
+}
+
+// MARK: - Send
+
+extension DatabaseManager {
+  
+  func sendMessage(to conversation: String, otherUserEmail: String, name: String,
+                   newMessage: Message, completion: @escaping (Bool) -> Void) {
+    
+    guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+      completion(false)
+      return
+    }
+    let currentEmail = safeEmail(email)
+    
+    manager.child("\(conversation)/messages").observeSingleEvent(of: .value, with: { [weak self] snapshot in
+      
+      guard let self, var currentMessages = snapshot.value as? [[String: Any]] else{
+        completion(false)
+        return
+      }
+      
+      let messageDate = newMessage.sentDate
+      let dateString = dateFormatter.string(from: messageDate)
+      
+      var message = ""
+      
+      switch newMessage.kind {
+        
+      case .text(let messageText):
+        message = messageText
+        
+      case .photo(let mediaItem):
+        if let targetUrlString = mediaItem.url?.absoluteString{
+          message = targetUrlString
+        }
+        break
+      case .video(let mediaItem):
+        if let targetUrlString = mediaItem.url?.absoluteString{
+          message = targetUrlString
+        }
+        
+        break
+      case .location(let locationData):
+        let location = locationData.location
+        message = "\(location.coordinate.longitude),\(location.coordinate.latitude)"
+        break
+      case .emoji(_):
+        break
+      }
+      guard let myEmmail = UserDefaults.standard.value(forKey: "email") as? String else{
+        completion(false)
+        return
+      }
+      
+      let currentUserEmail = safeEmail(email)
+      
+      let newMessageEntry: [String: Any] = [
+        "id": newMessage.messageId,
+        "type": newMessage.kind.description,
+        "content": message ,
+        "date": dateString,
+        "sender_email": currentUserEmail,
+        "is_read": false,
+        "name": name
+      ]
+      currentMessages.append(newMessageEntry)
+      
+      self.manager.child("\(conversation)/messages").setValue(currentMessages){ error, _ in
+        guard error == nil else {
+          
+          completion(false)
+          return
+        }
+        self.manager.child("\(currentEmail)/conversations").observeSingleEvent(of: .value, with: { snapshot in
+          
+          var databaseEntryConversations = [[String: Any]]()
+          
+          let updatedValue:[String: Any] = [
+            "date": dateString,
+            "is_read": false,
+            "message": message,
+          ]
+          
+          if var currentUserConversations = snapshot.value as? [[String: Any]] {
+            
+            var targetCoversation: [String:Any]?
+            var position = 0
+            for conversationDictionary in currentUserConversations {
+              if let currentId = conversationDictionary["id"] as? String, currentId == conversation {
+                targetCoversation = conversationDictionary
+                break
+              }
+              position += 1
+            }
+            
+            if var targetConversation = targetCoversation {
+              
+              targetConversation["latest_message"] = updatedValue
+              
+              currentUserConversations[position] = targetConversation
+              databaseEntryConversations = currentUserConversations
+            }
+            else {
+              let newConversationData: [String: Any] = [
+                "id": conversation,
+                "other_user_email":  self.safeEmail(otherUserEmail),
+                "name": name,
+                "latest_message": updatedValue
+              ]
+              
+              currentUserConversations.append(newConversationData)
+              databaseEntryConversations = currentUserConversations
+            }
+            
+          } else {
+            let newConversationData: [String: Any] = [
+              "id": conversation,
+              "other_user_email":  self.safeEmail(otherUserEmail),
+              "name": name,
+              "latest_message": updatedValue
+            ]
+            
+            databaseEntryConversations = [
+              newConversationData
+            ]
+          }
+          
+          
+          self.manager.child("\(currentEmail)/conversations").setValue(
+            databaseEntryConversations, withCompletionBlock: { error, _ in
+              guard error == nil else{
+                completion(false)
+                return
+              }
+              
+              self.manager.child("\(otherUserEmail)/conversations").observeSingleEvent(of: .value, with: { snapshot in
+                
+                //find conversation id in database
+                //array
+                let updatedValue:[String: Any] = [
+                  "date": dateString,
+                  "is_read": false,
+                  "message": message,
+                ]
+                
+                var databaseEntryConversations = [[String: Any]]()
+                guard let currentName = UserDefaults.standard.value(forKey: "name") as? String else {
+                  return
+                }
+                
+                if var otherUserConversations = snapshot.value as? [[String: Any]] {
+                  
+                  
+                  //dictionary
+                  var targetCoversation: [String:Any]?
+                  var position = 0
+                  for conversationDictionary in otherUserConversations {
+                    if let currentId = conversationDictionary["id"] as? String, currentId == conversation {
+                      targetCoversation = conversationDictionary
+                      break
+                    }
+                    position += 1
+                  }
+                  if var targetCoversation = targetCoversation {
+                    targetCoversation["latest_message"] = updatedValue
+                    
+                    otherUserConversations[position] = targetCoversation
+                    databaseEntryConversations = otherUserConversations
+                  }
+                  else{
+                    //failed to find in current collection
+                    //new conversation
+                    let newConversationData: [String: Any] = [
+                      "id": conversation,
+                      "other_user_email":  self.safeEmail(otherUserEmail),
+                      "name": currentName,
+                      "latest_message": updatedValue
+                    ]
+                    
+                    otherUserConversations.append(newConversationData)
+                    databaseEntryConversations = otherUserConversations
+                  }
+                  
+                } else {
+                  //current conversation does not exist
+                  //new conversation
+                  let newConversationData: [String: Any] = [
+                    "id": conversation,
+                    "other_user_email": self.safeEmail(currentEmail),
+                    "name": currentName,
+                    "latest_message": updatedValue
+                  ]
+                  
+                  databaseEntryConversations = [
+                    newConversationData
+                  ]
+                }
+                
+                
+                self.manager.child("\(otherUserEmail)/conversations").setValue(
+                  databaseEntryConversations, withCompletionBlock: { error, _ in
+                    guard error == nil else{
+                      completion(false)
+                      return
+                    }
+                    completion(true)
+                  })
+              })
+            })
+        })
+      }
+    })
+  }
+}
+
+struct Message {
+  var sender: SenderType
+  var messageId: String
+  var sentDate: Date
+  var kind: MessageKind
+}
+
+struct SenderType {
+  var senderId: String
+  var displayName: String
+}
+
+enum MessageKind {
+  case text(String), photo(Media), video(Media),
+       location(Location), emoji(String)
+  
+  var description: String {
+    switch self {
+    case .text: return "text"
+    case .photo: return "photo"
+    case .video: return "video"
+    case .location: return "location"
+    case .emoji: return "emoji"
+    }
+  }
+}
+
+struct Sender {
+  var photURL: String
+  var senderId: String
+  var displayName: String
+}
+
+struct Media {
+  var url: URL?
+  var image: UIImage?
+  var placeholderImage: UIImage
+  var size: CGSize
+}
+
+struct Location {
+  var location: CLLocation
+  var size: CGSize
+}
+
+// MARK: - Formatter
+
+extension DatabaseManager {
+  
+  var dateFormatter: DateFormatter {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .medium
+    formatter.timeStyle = .long
+    formatter.locale = .current
+    return formatter
+  }
+}
+
+// MARK: - Create Conversation
+
+extension DatabaseManager {
+  
+  func createNewConversation(with otherUserEmail: String,name: String,
+                             firstMessage: Message, completion: @escaping (Bool) -> Void) {
+    
+    guard let currentEmail = UserDefaults.standard.value(forKey: "email") as? String,
+          let currentNamme = UserDefaults.standard.value(forKey: "name") as? String else {
+      return
+    }
+    
+    let safeEmail = safeEmail(currentEmail)
+    let ref = manager.child("\(safeEmail)")
+    
+    ref.observeSingleEvent(of: .value, with: { [weak self] snapshot in
+      guard let self, var userNode = snapshot.value as? [String: Any] else {
+        completion(false)
+        print("user not Found")
+        return
+      }
+      //array
+      let messageDate = firstMessage.sentDate
+      let dateString = dateFormatter.string(from: messageDate)
+      
+      var message = ""
+      
+      switch firstMessage.kind {
+        
+      case .text(let messageText):
+        message = messageText
+        
+      case .photo(_):
+        break
+      case .video(_):
+        break
+      case .location(_):
+        break
+      case .emoji(_):
+        break
+      }
+      let conversationId = "conversation_\(firstMessage.messageId)"
+      
+      //new conversation
+      let newConversationData: [String: Any] = [
+        "id": conversationId,
+        "other_user_email": otherUserEmail,
+        "name": name,
+        "latest_message": [
+          "date": dateString,
+          "message": message,
+          "is_read": false
+        ]
+      ]
+      
+      //recipient
+      let recipient_newConversationData: [String: Any] = [
+        
+        "id": conversationId,
+        "other_user_email": safeEmail,
+        "name": currentNamme,
+        "latest_message": [
+          "date": dateString,
+          "message": message,
+          "is_read": false
+        ]
+      ]
+      //update recipient conversation
+      self.manager.child("\(otherUserEmail)/conversations").observeSingleEvent(
+        of: .value, with: { [weak self] snapshot in
+          if var conversations = snapshot.value as? [[String: Any]] {
+            //append
+            conversations.append(recipient_newConversationData)
+            self?.manager.child("\(otherUserEmail)/conversations").setValue(newConversationData)
+          }
+          else{
+            //create
+            self?.manager.child("\(otherUserEmail)/conversations").setValue([recipient_newConversationData])
+          }
+        })
+      
+      
+      //update current user conversation entry
+      if var conversations = userNode ["conversations"] as? [[String: Any]]{
+        //conversation array exists
+        conversations.append(newConversationData)
+        userNode["conversations"] = conversations
+        ref.setValue(userNode, withCompletionBlock: {[weak self] error, _ in
+          
+          guard error == nil else {
+            completion(false)
+            return
+          }
+          self?.finishCreatingCoversation(name: name,conversationID: conversationId, firstMessage: firstMessage, completion: completion)
+          //completion(true)
+        })
+        
+      } else {
+        //conversation does not exists
+        userNode["conversations"] = [
+          newConversationData
+        ]
+        ref.setValue(userNode, withCompletionBlock: {[weak self] error, _ in
+          
+          guard error == nil else {
+            completion(false)
+            return
+          }
+          self?.finishCreatingCoversation(name: name,conversationID: conversationId, firstMessage: firstMessage, completion: completion)
+          //completion(true)
+        })
+      }
+    })
+  }
+  
+  private func finishCreatingCoversation(name: String, conversationID: String, firstMessage: Message,
+                                         completion: @escaping (Bool) -> Void){
+    
+    //date
+    let messageDate = firstMessage.sentDate
+    let dateString = dateFormatter.string(from: messageDate)
+    
+    //content
+    var message = ""
+    
+    switch firstMessage.kind {
+      
+    case .text(let messageText):
+      message = messageText
+    case .photo(_):
+      break
+    case .video(_):
+      break
+    case .location(_):
+      break
+    case .emoji(_):
+      break
+    }
+    //sender email
+    guard let myEmmail = UserDefaults.standard.value(forKey: "email") as? String else{
+      completion(false)
+      return
+    }
+    let currentUserEmail = safeEmail(myEmmail)
+    
+    let collectionMessage: [String: Any] = [
+      "id": firstMessage.messageId,
+      "type": firstMessage.kind.description,
+      "content": message ,
+      "date": dateString,
+      "sender_email": currentUserEmail,
+      "is_read": false,
+      "name": name
+    ]
+    let value: [String: Any] = [
+      "messages": [
+        collectionMessage
+      ]
+    ]
+    debugPrint("adding convo:\(conversationID)")
+    
+    manager.child("\(conversationID)").setValue(value, withCompletionBlock: { error, _ in
+      guard error == nil else {
+        completion(false)
+        return
+      }
+      completion(true)
+    })
+  }
+}
+
+// MARK: - Message For Conversation
+
+extension DatabaseManager {
+  
+  func getAllMessagesForConversation(
+    with id: String, completion: @escaping (Result<[Message], Error>) -> Void) {
+      
+      manager.child("\(id)/messages").observe(.value, with: { [weak self] snapshot in
+        
+        guard let self, let value = snapshot.value as? [[String: Any]] else{
+          completion(.failure(DatabaseError.failedToFetch))
+          return
+        }
+        
+        let messages: [Message] = value.compactMap { dictionary in
+          
+          guard let name = dictionary["name"] as? String,
+                let isRead = dictionary["is_read"] as? Bool,
+                let messageID = dictionary["id"] as? String,
+                let content = dictionary["content"] as? String,
+                let senderEmail = dictionary["sender_email"] as? String,
+                let dateString = dictionary["date"] as? String,
+                let type = dictionary["type"] as? String,
+                //date
+                let date = self.dateFormatter.date(from: dateString) else {
+            return nil
+          }
+          
+          var kind: MessageKind?
+
+          if type == "photo" {
+            
+            guard let imageUrl = URL(string: content), let placeholder = UIImage(systemName: "plus") else{
+              return nil
+            }
+            let media = Media(url: imageUrl, image: nil, placeholderImage: placeholder, size: CGSize(width: 300, height: 300))
+            kind = .photo(media)
+          } else if type == "video" {
+
+            guard let videoUrl = URL(string: content), let placeholder = UIImage(named: "video_placeholder") else{
+              return nil
+            }
+            let media = Media(url: videoUrl, image: nil, placeholderImage: placeholder, size: CGSize(width: 300, height: 300))
+            kind = .video(media)
+          } else if type == "location" {
+            
+            let locationComponents = content.components(separatedBy: ",")
+            guard let longitude = Double(locationComponents[0]),
+                  let latitude = Double(locationComponents[1]) else {
+              return nil
+            }
+            print("Rendering location: long=\(longitude) | lat=\(latitude)")
+            let location = Location(location: CLLocation(latitude: latitude, longitude: longitude),
+                                    size: CGSize(width: 300, height: 300))
+            kind = .location(location)
+          } else {
+            kind = .text(content)
+          }
+          guard let finalKind = kind else {
+            return nil
+          }
+          let sender = SenderType(senderId: senderEmail, displayName: name)
+          
+          return Message(sender: sender, messageId: messageID, sentDate: date, kind: finalKind)
+        }
+        
+        completion(.success(messages))
+      })
+    }
 }
