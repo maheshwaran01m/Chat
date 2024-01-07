@@ -11,7 +11,8 @@ class NewConversationViewController: UIViewController {
   
   private let tableView: UITableView = {
     $0.tableFooterView = UIView()
-    $0.rowHeight = 190
+    $0.register(NewConversationCell.self, forCellReuseIdentifier: NewConversationCell.identifier)
+    $0.rowHeight = UITableView.automaticDimension
     $0.isHidden = true
     return $0
   }(UITableView())
@@ -30,7 +31,7 @@ class NewConversationViewController: UIViewController {
     return $0
   }(UILabel())
   
-  private var users = [[String: String]]()
+  private var users = [String: String]()
   private var records = [SearchResult]()
   private var hasFetched = false
   
@@ -60,6 +61,8 @@ extension NewConversationViewController: UITableViewDelegate, UITableViewDataSou
     view.addSubview(tableView)
     title = "Search"
     view.backgroundColor = .systemBackground
+    tableView.delegate = self
+    tableView.dataSource = self
     setupConstriants()
   }
   
@@ -127,6 +130,8 @@ extension NewConversationViewController: UISearchBarDelegate {
     searchBar.searchBar.delegate = self
     navigationItem.searchController = searchBar
     searchBar.becomeFirstResponder()
+    searchBar.obscuresBackgroundDuringPresentation = false
+    navigationItem.hidesSearchBarWhenScrolling = false
   }
   
   func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -163,7 +168,7 @@ extension NewConversationViewController: UISearchBarDelegate {
     }
     let safeEmail = DatabaseManager.shared.safeEmail(currentUser)
     
-    let results: [SearchResult] = users.filter {
+    records = [users].filter {
       guard let email = $0["email"], email != safeEmail else{
         return false
       }
@@ -171,13 +176,13 @@ extension NewConversationViewController: UISearchBarDelegate {
         return false
       }
       return name.hasPrefix(value.lowercased())
-    }.compactMap {
+    } .compactMap {
       guard let email = $0["email"] ,let name = $0["name"] else{
         return nil
       }
       return SearchResult(name: name, email: email)
     }
-    records = results
+    
     updateUI()
   }
   

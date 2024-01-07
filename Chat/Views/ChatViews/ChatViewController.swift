@@ -14,12 +14,17 @@ class ChatViewController: UIViewController {
     return $0
   }(UITableView())
   
+  private var item: ChatItem
+  private var messages = [Message]()
+  
   init(_ item: ChatItem) {
+    self.item = item
     super.init(nibName: nil, bundle: nil)
     setupTableView()
   }
   
   required init?(coder: NSCoder) {
+    self.item = .init("", name: "")
     super.init(coder: coder)
     setupTableView()
   }
@@ -44,6 +49,28 @@ extension ChatViewController {
     ])
   }
 }
+
+extension ChatViewController {
+  
+  private var selfSender: Sender? {
+    guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+      return nil
+    }
+    let safeEmail = DatabaseManager.shared.safeEmail(email)
+    
+    return Sender(photURL: "", senderId: safeEmail , displayName: "Me")
+  }
+  
+  private var dateFormatter: DateFormatter {
+    let formatter = DateFormatter()
+    formatter.dateStyle = .medium
+    formatter.timeStyle = .long
+    formatter.locale = .current
+    return formatter
+  }
+}
+
+// MARK: - ChatItem
 
 struct ChatItem {
   let email: String

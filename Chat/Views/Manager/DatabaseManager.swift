@@ -44,7 +44,7 @@ struct User {
   let profileImage: Data?
   
   var profileImageName: String {
-    "\(emailAddress)_profile_picture.png"
+    "\(safeEmail)_profile_picture.png"
   }
   
   var safeEmail: String {
@@ -309,9 +309,10 @@ extension DatabaseManager {
 
 extension DatabaseManager {
   
-  func getAllUsers(_ completion: @escaping (Result<[[String: String]], Error>) -> Void) {
+  func getAllUsers(_ completion: @escaping (Result<[String: String], Error>) -> Void) {
+    
     manager.child("users").observeSingleEvent(of: .value, with: { snapshot in
-      guard let value = snapshot.value as? [[String: String]] else {
+      guard let value = snapshot.value as? [String: String] else {
         completion(.failure(DatabaseError.failedToFetch))
         return
       }
@@ -377,7 +378,7 @@ extension DatabaseManager {
         return
       }
       
-      let currentUserEmail = safeEmail(email)
+      let currentUserEmail = safeEmail(myEmmail)
       
       let newMessageEntry: [String: Any] = [
         "id": newMessage.messageId,
@@ -784,7 +785,7 @@ extension DatabaseManager {
         let messages: [Message] = value.compactMap { dictionary in
           
           guard let name = dictionary["name"] as? String,
-                let isRead = dictionary["is_read"] as? Bool,
+                /*let isRead = dictionary["is_read"] as? Bool,*/
                 let messageID = dictionary["id"] as? String,
                 let content = dictionary["content"] as? String,
                 let senderEmail = dictionary["sender_email"] as? String,
@@ -796,7 +797,7 @@ extension DatabaseManager {
           }
           
           var kind: MessageKind?
-
+          
           if type == "photo" {
             
             guard let imageUrl = URL(string: content), let placeholder = UIImage(systemName: "plus") else{
@@ -805,7 +806,7 @@ extension DatabaseManager {
             let media = Media(url: imageUrl, image: nil, placeholderImage: placeholder, size: CGSize(width: 300, height: 300))
             kind = .photo(media)
           } else if type == "video" {
-
+            
             guard let videoUrl = URL(string: content), let placeholder = UIImage(named: "video_placeholder") else{
               return nil
             }
