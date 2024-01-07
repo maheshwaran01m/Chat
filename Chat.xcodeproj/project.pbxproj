@@ -53,6 +53,8 @@
 		9D3043812B4A9ACC005C16C5 /* ConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043802B4A9ACC005C16C5 /* ConversationViewModel.swift */; };
 		9D3043842B4AA68A005C16C5 /* ChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043832B4AA68A005C16C5 /* ChatViewController.swift */; };
 		9D3043872B4AAB23005C16C5 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043862B4AAB23005C16C5 /* ProfileViewController.swift */; };
+		9D3043892B4AC03E005C16C5 /* NewConversationCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043882B4AC03E005C16C5 /* NewConversationCell.swift */; };
+		9D30438B2B4AC17B005C16C5 /* NewConversationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30438A2B4AC17B005C16C5 /* NewConversationViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +79,8 @@
 		9D3043802B4A9ACC005C16C5 /* ConversationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConversationViewModel.swift; sourceTree = "<group>"; };
 		9D3043832B4AA68A005C16C5 /* ChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatViewController.swift; sourceTree = "<group>"; };
 		9D3043862B4AAB23005C16C5 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		9D3043882B4AC03E005C16C5 /* NewConversationCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationCell.swift; sourceTree = "<group>"; };
+		9D30438A2B4AC17B005C16C5 /* NewConversationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,6 +208,7 @@
 			isa = PBXGroup;
 			children = (
 				9D30437B2B4A9663005C16C5 /* ConversationCell.swift */,
+				9D3043882B4AC03E005C16C5 /* NewConversationCell.swift */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -220,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				9D3043832B4AA68A005C16C5 /* ChatViewController.swift */,
+				9D30438A2B4AC17B005C16C5 /* NewConversationViewController.swift */,
 			);
 			path = ChatViews;
 			sourceTree = "<group>";
@@ -341,6 +347,7 @@
 				9D3043192B4A433D005C16C5 /* AppDelegate.swift in Sources */,
 				9D30436E2B4A6C50005C16C5 /* ImagePickerVC.swift in Sources */,
 				9D30436C2B4A5D0A005C16C5 /* CustomExtensions.swift in Sources */,
+				9D30438B2B4AC17B005C16C5 /* NewConversationViewController.swift in Sources */,
 				9D3043872B4AAB23005C16C5 /* ProfileViewController.swift in Sources */,
 				9D30431B2B4A433D005C16C5 /* SceneDelegate.swift in Sources */,
 				9D3043812B4A9ACC005C16C5 /* ConversationViewModel.swift in Sources */,
@@ -351,6 +358,7 @@
 				9D3043752B4A7696005C16C5 /* DatabaseManager.swift in Sources */,
 				9D3043842B4AA68A005C16C5 /* ChatViewController.swift in Sources */,
 				9D3043792B4A8666005C16C5 /* LoginViewController.swift in Sources */,
+				9D3043892B4AC03E005C16C5 /* NewConversationCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

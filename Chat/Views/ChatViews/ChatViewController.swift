@@ -14,7 +14,7 @@ class ChatViewController: UIViewController {
     return $0
   }(UITableView())
   
-  init(with email: String, id: String?) {
+  init(_ item: ChatItem) {
     super.init(nibName: nil, bundle: nil)
     setupTableView()
   }
@@ -29,6 +29,8 @@ extension ChatViewController {
   
   private func setupTableView() {
     view.addSubview(tableView)
+    view.backgroundColor = .systemBackground
+    navigationItem.largeTitleDisplayMode = .never
     setupConstriants()
   }
   
@@ -40,5 +42,19 @@ extension ChatViewController {
       tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
       tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
+  }
+}
+
+struct ChatItem {
+  let email: String
+  var id: String?
+  let name: String
+  let isNewConversation: Bool
+  
+  init(_ email: String, id: String? = nil, name: String, isNew: Bool = false) {
+    self.email = email
+    self.id = id
+    self.name = name
+    self.isNewConversation = isNew
   }
 }

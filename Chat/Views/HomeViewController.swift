@@ -104,7 +104,40 @@ extension HomeViewController {
   
   
   @objc private func addButtonClicked() {
+    let vc = NewConversationViewController { [weak self] result in
+      guard let self else { return }
+      
+      if let conversation = self.viewModel.conversations.first(
+        where: { $0.otherUserEmail == DatabaseManager.shared.safeEmail(result.email) }) {
+        let vc = ChatViewController(.init(conversation.otherUserEmail, id: conversation.id, name: conversation.name))
+        self.navigationController?.pushViewController(vc, animated: true)
+      } else {
+        createNewConversation(result)
+      }
+      
+    }
+    let navigation = UINavigationController(rootViewController: vc)
+    present(navigation, animated: true)
+  }
+  
+  private func createNewConversation(_ value: SearchResult) {
+    let email = DatabaseManager.shared.safeEmail(value.email)
     
+    DatabaseManager.shared.conversationExist(
+      with: email) { [weak self] result in
+        guard let self else { return }
+        
+        switch result {
+        case .success(let id):
+          let vc = ChatViewController(.init(
+            email, id: id, name: value.name, isNew: false))
+          self.navigationController?.pushViewController(vc, animated: true)
+          
+        case .failure:
+          let vc = ChatViewController(.init(email, name: value.name, isNew: false))
+          self.navigationController?.pushViewController(vc, animated: true)
+        }
+      }
   }
 }
 

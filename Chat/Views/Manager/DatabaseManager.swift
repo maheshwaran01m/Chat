@@ -302,3 +302,22 @@ extension DatabaseManager {
     })
   }
 }
+
+// MARK: - Get Users
+
+extension DatabaseManager {
+  
+  func getAllUsers(_ completion: @escaping (Result<[[String: String]], Error>) -> Void) {
+    manager.child("users").observeSingleEvent(of: .value, with: { snapshot in
+      guard let value = snapshot.value as? [[String: String]] else {
+        completion(.failure(DatabaseError.failedToFetch))
+        return
+      }
+      completion(.success(value))
+    })
+  }
+  
+  enum DatabaseError: Error {
+    case failedToFetch
+  }
+}
