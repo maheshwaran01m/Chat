@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import FirebaseAuth
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
   
@@ -17,11 +18,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
     guard let scene = (scene as? UIWindowScene) else { return }
     window = UIWindow(windowScene: scene)
-    
-    let navigationVC = UINavigationController(rootViewController: ViewController())
-    navigationVC.navigationBar.prefersLargeTitles = true
-    
-    window?.rootViewController = navigationVC
+    window?.rootViewController = getCurrentViewController
     window?.makeKeyAndVisible()
   }
   
@@ -51,5 +48,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     // Called as the scene transitions from the foreground to the background.
     // Use this method to save data, release shared resources, and store enough scene-specific state information
     // to restore the scene back to its current state.
+  }
+}
+
+// MARK: - Login / Home 
+
+extension SceneDelegate {
+  
+  private var getCurrentViewController: UINavigationController {
+    
+    guard FirebaseAuth.Auth.auth().currentUser != nil else {
+      let vc = UINavigationController(rootViewController: LoginViewController())
+      vc.modalPresentationStyle = .fullScreen
+      vc.navigationBar.prefersLargeTitles = true
+      return vc
+    }
+    
+    let vc = UINavigationController(rootViewController: HomeViewController())
+    vc.modalPresentationStyle = .fullScreen
+    vc.navigationBar.prefersLargeTitles = true
+    return vc
   }
 }

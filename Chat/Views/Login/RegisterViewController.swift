@@ -249,7 +249,7 @@ extension RegisterViewController {
         return
       }
       
-      let navigationVC = UINavigationController(rootViewController: ViewController())
+      let navigationVC = UINavigationController(rootViewController: HomeViewController())
       navigationVC.modalPresentationStyle = .fullScreen
       present(navigationVC, animated: true)
     }
