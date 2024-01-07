@@ -187,3 +187,118 @@ extension DatabaseManager {
     }
   }
 }
+
+// MARK: - Get
+
+extension DatabaseManager {
+  
+  func getAllConversations(for email: String,
+                           completion: @escaping (Result<[Conversation], Error>) -> Void) {
+    
+    manager.child("\(safeEmail(email))/conversations").observe(.value, with: { snapshot in
+      
+      guard let value = snapshot.value as? [[String: Any]] else{
+        completion(.failure(URLError(.downloadDecodingFailedToComplete)))
+        return
+      }
+      let conversations: [Conversation] = value.compactMap { dictionary in
+        guard let conversationId = dictionary["id"] as? String,
+              let name = dictionary["name"] as? String,
+              let otherUserEmail = dictionary["other_user_email"] as? String,
+              let latestMessage = dictionary["latest_message"] as? [String: Any],
+              let date = latestMessage["date"] as? String,
+              let message = latestMessage["message"] as? String,
+              let isRead = latestMessage["is_read"] as? Bool else{
+          
+          return nil
+        }
+        let latestMessageObject = LatestMessage(date: date, text: message, isRead: isRead)
+        
+        return .init(id: conversationId, name: name, otherUserEmail: otherUserEmail, latestMessage: latestMessageObject)
+      }
+      completion(.success(conversations))
+    })
+  }
+}
+
+// MARK: - Search
+
+extension DatabaseManager {
+  
+  func conversationExist(with targetRecipientEmail: String, completion: @escaping (Result<String, Error>)-> Void){
+      
+      let safeRecipientEmail = safeEmail(targetRecipientEmail)
+      guard let senderEmail = UserDefaults.standard.value(forKey: "email") as? String else {
+          return
+      }
+      let safeSenderEmail = safeEmail(senderEmail)
+      
+      manager.child("\(safeRecipientEmail)").observeSingleEvent(of: .value, with: { snapshot in
+          guard let collection = snapshot.value as? [[String: Any]] else {
+            completion(.failure(URLError(.cancelled)))
+              return
+          }
+          
+          //iterate and find conversation with target
+          if let conversation = collection.first(where: {
+              guard let targetSenderEmail = $0["other_user_email"] as? String else{
+                  return false
+              }
+              return safeSenderEmail == targetSenderEmail
+          }){
+             //get id
+              guard let id = conversation["id"] as? String else {
+                  completion(.failure(URLError(.cancelled)))
+                  return
+              }
+              completion(.success(id))
+              return
+          }
+          completion(.failure(URLError(.cancelled)))
+          return
+      })
+  }
+}
+
+// MARK: - Delete
+
+extension DatabaseManager {
+  
+  func deleteConversation(conversationId: String, completion: @escaping(Bool) -> Void) {
+    
+    guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+      return
+    }
+    let safeEmail = safeEmail(email)
+    
+    debugPrint("Deleting Conversation with id: \(conversationId)")
+    
+    let ref = manager.child("\(safeEmail)/conversations")
+    
+    ref.observeSingleEvent(of: .value, with: { snapshot in
+      if var conversations = snapshot.value as? [[String: Any]] {
+        var positionToRemove = 0
+        
+        for conversation in conversations {
+          if let id = conversation["id"] as? String,
+             id == conversationId {
+            debugPrint("Found conversation to delete")
+            break
+          }
+          positionToRemove += 1
+        }
+        
+        conversations.remove(at: positionToRemove)
+        ref.setValue(conversations, withCompletionBlock: { error,_ in
+          guard error == nil else{
+            completion(false)
+            debugPrint("Failed to delete")
+            return
+          }
+          
+          completion(true)
+        })
+      }
+    })
+  }
+}
