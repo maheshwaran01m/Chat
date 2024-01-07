@@ -116,7 +116,7 @@ class RegisterViewController: UIViewController {
   }
   
   private func setupView() {
-    title = "SignUp"
+    title = "Register"
     view.backgroundColor = .systemBackground
     setupSubViews()
   }
@@ -250,8 +250,8 @@ extension RegisterViewController {
       }
       
       let navigationVC = UINavigationController(rootViewController: ViewController())
+      navigationVC.modalPresentationStyle = .fullScreen
       present(navigationVC, animated: true)
-      
     }
   }
 }
