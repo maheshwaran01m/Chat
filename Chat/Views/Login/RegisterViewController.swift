@@ -241,10 +241,11 @@ extension RegisterViewController {
       emailAddress: email,
       password: password,
       profileImage: imageView.image?.pngData())
-    
+    registerButton.setTitle("Creating...", for: .normal)
     DatabaseManager.shared.checkAndCreateUser(for: user) { [weak self] error in
       guard let self else { return }
       guard error == nil else {
+        registerButton.setTitle("Register", for: .normal)
         self.showAlert("Unable to create user", message: error?.localizedLowercase)
         return
       }

@@ -33,7 +33,7 @@ extension ConversationViewModel {
     DatabaseManager.shared.getAllConversations(for: email) { [weak self] result in
       guard let self else { return }
       switch result {
-      case .success(let conversation):
+      case .success(let conversations):
         self.conversations = conversations
         delegate?.updateUI()
         
