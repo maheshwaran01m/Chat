@@ -14,8 +14,8 @@ extension UIViewController {
                                   message: message,
                                   preferredStyle: .alert)
     
-    let buttonAction = UIAlertAction(title: button, style: .default) { [weak self] _ in
-      self?.dismiss(animated: true)
+    let buttonAction = UIAlertAction(title: button, style: .default) { _ in
+      alert.dismiss(animated: true)
     }
     alert.addAction(buttonAction)
     alert.preferredAction = buttonAction
@@ -27,7 +27,6 @@ extension UIViewController {
                                   y: view.bounds.midY,
                                   width: 0, height: 0)
     }
-    
     present(alert, animated: true)
   }
 }

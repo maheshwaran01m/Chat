@@ -27,7 +27,7 @@ class HomeViewController: UIViewController {
     title = "Home"
     viewModel.delegate = self
     setupTableView()
-    addButton()
+    navigationBarButtons()
   }
 }
 
@@ -37,9 +37,19 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
   
   private func setupTableView() {
     view.addSubview(tableView)
-    tableView.frame = view.bounds
     tableView.dataSource = self
     tableView.delegate = self
+    setupConstriants()
+  }
+  
+  private func setupConstriants() {
+    tableView.translatesAutoresizingMaskIntoConstraints = false
+    NSLayoutConstraint.activate([
+      tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+    ])
   }
   
   func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -80,10 +90,18 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 
 extension HomeViewController {
   
-  private func addButton() {
+  private func navigationBarButtons() {
     navigationItem.rightBarButtonItem = .init(
       barButtonSystemItem: .add, target: self, action: #selector(addButtonClicked))
+    navigationItem.leftBarButtonItem = .init(
+      image: .init(systemName: "gear"), style: .done, target: self, action: #selector(profileButtonClicked))
   }
+  
+  @objc private func profileButtonClicked() {
+    let vc = ProfileViewController()
+    navigationController?.pushViewController(vc, animated: true)
+  }
+  
   
   @objc private func addButtonClicked() {
     

@@ -171,13 +171,14 @@ extension LoginViewController {
       showAlert("Warning", message: "Please Enter valid password")
       return
     }
+    loginButton.setTitle("Signing In...", for: .normal)
     DatabaseManager.shared.signIn(for: email, password: password) {[weak self] error in
       guard let self else { return }
       guard error == nil else {
+        loginButton.setTitle("Sign Up", for: .normal)
         self.showAlert("Unable to create user", message: error?.localizedLowercase)
         return
       }
-      
       let navigationVC = UINavigationController(rootViewController: HomeViewController())
       navigationVC.modalPresentationStyle = .fullScreen
       navigationVC.navigationBar.prefersLargeTitles = true
