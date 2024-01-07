@@ -40,6 +40,9 @@
 		9D3043622B4A48AA005C16C5 /* FirebaseRemoteConfigSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 9D3043612B4A48AA005C16C5 /* FirebaseRemoteConfigSwift */; };
 		9D3043642B4A48AA005C16C5 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 9D3043632B4A48AA005C16C5 /* FirebaseStorage */; };
 		9D3043662B4A48AA005C16C5 /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 9D3043652B4A48AA005C16C5 /* FirebaseStorageCombine-Community */; };
+		9D3043692B4A5026005C16C5 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043682B4A5026005C16C5 /* RegisterViewController.swift */; };
+		9D30436C2B4A5D0A005C16C5 /* CustomExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30436B2B4A5D0A005C16C5 /* CustomExtensions.swift */; };
+		9D30436E2B4A6C50005C16C5 /* ImagePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30436D2B4A6C50005C16C5 /* ImagePickerVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +54,9 @@
 		9D3043242B4A433E005C16C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9D3043262B4A433E005C16C5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9D30432E2B4A47E6005C16C5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		9D3043682B4A5026005C16C5 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
+		9D30436B2B4A5D0A005C16C5 /* CustomExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExtensions.swift; sourceTree = "<group>"; };
+		9D30436D2B4A6C50005C16C5 /* ImagePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -132,9 +138,28 @@
 		9D30432D2B4A4411005C16C5 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9D30436A2B4A5CF3005C16C5 /* CustomExtensions */,
+				9D3043672B4A4FFE005C16C5 /* Login */,
 				9D30431C2B4A433D005C16C5 /* ViewController.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		9D3043672B4A4FFE005C16C5 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				9D3043682B4A5026005C16C5 /* RegisterViewController.swift */,
+			);
+			path = Login;
+			sourceTree = "<group>";
+		};
+		9D30436A2B4A5CF3005C16C5 /* CustomExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				9D30436B2B4A5D0A005C16C5 /* CustomExtensions.swift */,
+				9D30436D2B4A6C50005C16C5 /* ImagePickerVC.swift */,
+			);
+			path = CustomExtensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -242,7 +267,10 @@
 			files = (
 				9D30431D2B4A433D005C16C5 /* ViewController.swift in Sources */,
 				9D3043192B4A433D005C16C5 /* AppDelegate.swift in Sources */,
+				9D30436E2B4A6C50005C16C5 /* ImagePickerVC.swift in Sources */,
+				9D30436C2B4A5D0A005C16C5 /* CustomExtensions.swift in Sources */,
 				9D30431B2B4A433D005C16C5 /* SceneDelegate.swift in Sources */,
+				9D3043692B4A5026005C16C5 /* RegisterViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
