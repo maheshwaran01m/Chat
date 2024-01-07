@@ -180,6 +180,7 @@ extension LoginViewController {
       
       let navigationVC = UINavigationController(rootViewController: HomeViewController())
       navigationVC.modalPresentationStyle = .fullScreen
+      navigationVC.navigationBar.prefersLargeTitles = true
       present(navigationVC, animated: true)
     }
   }
