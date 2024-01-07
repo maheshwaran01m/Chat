@@ -19,7 +19,7 @@ final class StorageManager {
   typealias UploadPictureCompletion = (Result<String, Error>) -> Void
   
   ///uploads picture to firebase storage and returns compeltion to url string to download
-  func uploadProfilePicture(with data: Data,fileName: String, completion: @escaping UploadPictureCompletion){
+  func uploadProfilePicture(with data: Data, fileName: String, completion: @escaping UploadPictureCompletion){
     
     storage.child("images/\(fileName)").putData(data, metadata: nil, completion: {[weak self] metadata, error in
       guard let strongSelf = self else {
@@ -100,7 +100,7 @@ extension StorageManager {
   
   func downloadURL(for path: String, completion:@escaping (Result<URL, Error>) -> Void){
     let reference = storage.child(path)
-    reference.downloadURL(completion: {url, error in
+    reference.downloadURL(completion: { url, error in
       guard let url = url, error == nil else {
         completion(.failure(StorageErrors.failedToGetDownloadUrl))
         return

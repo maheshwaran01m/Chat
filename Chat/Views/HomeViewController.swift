@@ -114,7 +114,6 @@ extension HomeViewController {
       } else {
         createNewConversation(result)
       }
-      
     }
     let navigation = UINavigationController(rootViewController: vc)
     present(navigation, animated: true)

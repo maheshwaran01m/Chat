@@ -242,6 +242,7 @@ extension RegisterViewController {
       password: password,
       profileImage: imageView.image?.pngData())
     registerButton.setTitle("Creating...", for: .normal)
+    
     DatabaseManager.shared.checkAndCreateUser(for: user) { [weak self] error in
       guard let self else { return }
       guard error == nil else {
