@@ -215,5 +215,43 @@ extension RegisterViewController {
   
   @objc private func registerButtonClicked() {
     resignFirstResponderForView(firstNameField, lastNameField, emailField, passwordField)
+    
+    guard let firstName = firstNameField.text, firstName.isNotEmpty else {
+      showAlert("Warning", message: "Please Enter your first name")
+      return
+    }
+    
+    guard let lastName = lastNameField.text, lastName.isNotEmpty else {
+      showAlert("Warning", message: "Please Enter your last name")
+      return
+    }
+    
+    guard let email = emailField.text, email.isValidEmail else {
+      showAlert("Warning", message: "Please Enter your valid email address")
+      return
+    }
+    
+    guard let password = passwordField.text, password.count >= 6 else {
+      showAlert("Warning", message: "Please Enter valid password, Minimum six character")
+      return
+    }
+    let user = User(
+      firstName: firstName,
+      lastName: lastName,
+      emailAddress: email,
+      password: password,
+      profileImage: imageView.image?.pngData())
+    
+    DatabaseManager.shared.checkAndCreateUser(for: user) { [weak self] error in
+      guard let self else { return }
+      guard error == nil else {
+        self.showAlert("Unable to create user", message: error?.localizedLowercase)
+        return
+      }
+      
+      let navigationVC = UINavigationController(rootViewController: ViewController())
+      present(navigationVC, animated: true)
+      
+    }
   }
 }

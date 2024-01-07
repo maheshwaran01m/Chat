@@ -43,6 +43,10 @@
 		9D3043692B4A5026005C16C5 /* RegisterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043682B4A5026005C16C5 /* RegisterViewController.swift */; };
 		9D30436C2B4A5D0A005C16C5 /* CustomExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30436B2B4A5D0A005C16C5 /* CustomExtensions.swift */; };
 		9D30436E2B4A6C50005C16C5 /* ImagePickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30436D2B4A6C50005C16C5 /* ImagePickerVC.swift */; };
+		9D3043702B4A7029005C16C5 /* AlertVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30436F2B4A7029005C16C5 /* AlertVC.swift */; };
+		9D3043722B4A731F005C16C5 /* Strings+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043712B4A731F005C16C5 /* Strings+Extensions.swift */; };
+		9D3043752B4A7696005C16C5 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043742B4A7696005C16C5 /* DatabaseManager.swift */; };
+		9D3043772B4A7E42005C16C5 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043762B4A7E42005C16C5 /* StorageManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -57,6 +61,10 @@
 		9D3043682B4A5026005C16C5 /* RegisterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegisterViewController.swift; sourceTree = "<group>"; };
 		9D30436B2B4A5D0A005C16C5 /* CustomExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomExtensions.swift; sourceTree = "<group>"; };
 		9D30436D2B4A6C50005C16C5 /* ImagePickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerVC.swift; sourceTree = "<group>"; };
+		9D30436F2B4A7029005C16C5 /* AlertVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertVC.swift; sourceTree = "<group>"; };
+		9D3043712B4A731F005C16C5 /* Strings+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Strings+Extensions.swift"; sourceTree = "<group>"; };
+		9D3043742B4A7696005C16C5 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		9D3043762B4A7E42005C16C5 /* StorageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +146,7 @@
 		9D30432D2B4A4411005C16C5 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				9D3043732B4A767A005C16C5 /* Manager */,
 				9D30436A2B4A5CF3005C16C5 /* CustomExtensions */,
 				9D3043672B4A4FFE005C16C5 /* Login */,
 				9D30431C2B4A433D005C16C5 /* ViewController.swift */,
@@ -158,8 +167,19 @@
 			children = (
 				9D30436B2B4A5D0A005C16C5 /* CustomExtensions.swift */,
 				9D30436D2B4A6C50005C16C5 /* ImagePickerVC.swift */,
+				9D30436F2B4A7029005C16C5 /* AlertVC.swift */,
+				9D3043712B4A731F005C16C5 /* Strings+Extensions.swift */,
 			);
 			path = CustomExtensions;
+			sourceTree = "<group>";
+		};
+		9D3043732B4A767A005C16C5 /* Manager */ = {
+			isa = PBXGroup;
+			children = (
+				9D3043742B4A7696005C16C5 /* DatabaseManager.swift */,
+				9D3043762B4A7E42005C16C5 /* StorageManager.swift */,
+			);
+			path = Manager;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -265,12 +285,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D3043722B4A731F005C16C5 /* Strings+Extensions.swift in Sources */,
 				9D30431D2B4A433D005C16C5 /* ViewController.swift in Sources */,
 				9D3043192B4A433D005C16C5 /* AppDelegate.swift in Sources */,
 				9D30436E2B4A6C50005C16C5 /* ImagePickerVC.swift in Sources */,
 				9D30436C2B4A5D0A005C16C5 /* CustomExtensions.swift in Sources */,
 				9D30431B2B4A433D005C16C5 /* SceneDelegate.swift in Sources */,
 				9D3043692B4A5026005C16C5 /* RegisterViewController.swift in Sources */,
+				9D3043772B4A7E42005C16C5 /* StorageManager.swift in Sources */,
+				9D3043702B4A7029005C16C5 /* AlertVC.swift in Sources */,
+				9D3043752B4A7696005C16C5 /* DatabaseManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
