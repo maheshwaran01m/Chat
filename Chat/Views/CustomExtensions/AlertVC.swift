@@ -20,6 +20,14 @@ extension UIViewController {
     alert.addAction(buttonAction)
     alert.preferredAction = buttonAction
     
+    if let popOver = alert.popoverPresentationController {
+      self.modalPresentationStyle = .popover
+      popOver.sourceView = view
+      popOver.sourceRect = CGRect(x: view.bounds.midX,
+                                  y: view.bounds.midY,
+                                  width: 0, height: 0)
+    }
+    
     present(alert, animated: true)
   }
 }

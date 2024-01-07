@@ -40,6 +40,14 @@ class ImagePickerVC: NSObject, UIImagePickerControllerDelegate, UINavigationCont
       handler: { [weak self] _ in
         self?.presentPhotPicker(vc)
       }))
+    if let popOver = actionSheet.popoverPresentationController {
+      vc.modalPresentationStyle = .popover
+      popOver.sourceView = vc.view
+      popOver.sourceRect = CGRect(x: vc.view.bounds.midX,
+                                  y: vc.view.bounds.midY,
+                                  width: 0, height: 0)
+    }
+    
     vc.present(actionSheet, animated: true)
   }
   

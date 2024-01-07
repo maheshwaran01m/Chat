@@ -54,7 +54,7 @@ struct User {
 
 extension DatabaseManager {
   
-  static func safeEmail(_ emailAddress: String) -> String {
+  func safeEmail(_ emailAddress: String) -> String {
     var safeEmail = emailAddress.replacingOccurrences(of: ".", with: "-")
     safeEmail = safeEmail.replacingOccurrences(of: "@", with: "-")
     return safeEmail
@@ -149,5 +149,41 @@ extension DatabaseManager {
             
           }
       }
+  }
+}
+
+// MARK: - Sign In
+
+extension DatabaseManager {
+  
+  func signIn(for email: String, password: String, completion: @escaping (String?) -> Void) {
+    FirebaseAuth.Auth.auth().signIn(withEmail: email, password: password) { [weak self] result, error in
+      guard let self else { return }
+      
+      guard error == nil, let result else {
+        completion("Failed to Login")
+        debugPrint("Login Error: \(error?.localizedDescription ?? "")")
+        return
+      }
+      let safeEmail = safeEmail(email)
+      
+      manager.child(safeEmail)
+        .observeSingleEvent(of: .value) { snapshot in
+          guard let value = snapshot.value else {
+            completion("Failed to Login for email: \(email)")
+            return
+          }
+          guard let userData = value as? [String: Any],
+                let firstName = userData["first_name"] as? String,
+                let lastName = userData["last_name"] as? String else {
+            return
+          }
+          UserDefaults.standard.set("\(firstName) \(lastName)", forKey: "name")
+          UserDefaults.standard.set(email, forKey: "email")
+          
+          debugPrint("Logged In: \(result.user)")
+          completion(nil)
+        }
+    }
   }
 }
