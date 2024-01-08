@@ -37,26 +37,8 @@ class MessageCell: UICollectionViewCell {
   }
   
   func configure(_ message: Message) {
-    let id = message.messageId
-    let currentUser = message.sender.senderId//sender.senderId == selfSender?.senderId
-//    let url = message.kind == .photo(let url)
-    
-    
-    
-//    messageLabel.text = item.message
-//    setupConstraints()
-//    
-//    if item.currentUser {
-//      leftImageView.isHidden = true
-//      rightImageView.isHidden = false
-//      stackView.backgroundColor = .systemBlue
-//      rightImageView.getCachedImage(item.imageURL.absoluteString)
-//    } else {
-//      rightImageView.isHidden = true
-//      leftImageView.isHidden = false
-//      stackView.backgroundColor = .systemGray
-//      leftImageView.getCachedImage(item.imageURL.absoluteString)
-//    }
+    updatedUI(using: message)
+    setupConstraints()
   }
   
   private func setup() {
@@ -100,7 +82,7 @@ class MessageCell: UICollectionViewCell {
     return DatabaseManager.shared.safeEmail(email) == message.sender.senderId
   }
   
-  private func imageURL(_ message: Message) {
+  private func updatedUI(using message: Message) {
     
     switch message.kind {
     case .photo(let media):
@@ -108,9 +90,17 @@ class MessageCell: UICollectionViewCell {
       
       if isCurrentUser(message) {
         rightImageView.getCachedImage(url.absoluteString)
+        leftImageView.isHidden = true
+        rightImageView.isHidden = false
+        stackView.backgroundColor = .systemBlue
       } else {
         leftImageView.getCachedImage(url.absoluteString)
+        leftImageView.isHidden = false
+        rightImageView.isHidden = true
+        stackView.backgroundColor = .secondarySystemBackground
       }
+    case .text(let text):
+      messageLabel.text = text
       
     default: break
     }
