@@ -141,7 +141,7 @@ extension ChatViewController: UICollectionViewDelegate, UICollectionViewDataSour
       withReuseIdentifier: MessageCell.identifier, for: indexPath) as? MessageCell else {
       return .init()
     }
-    cell.configure(messages[indexPath.row])
+    cell.configure(messages[indexPath.row], item: item)
     return cell
   }
 }
