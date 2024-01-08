@@ -9,58 +9,57 @@ import UIKit
 
 class ChatViewController: UIViewController {
   
-  private let tableView: UITableView = {
-    $0.tableFooterView = UIView()
-    return $0
-  }(UITableView())
-  
   private var item: ChatItem
   private var messages = [Message]()
+  private var collectionView: UICollectionView?
   
   init(_ item: ChatItem) {
     self.item = item
     super.init(nibName: nil, bundle: nil)
-    setupTableView()
+    setupCollectionView()
   }
   
   required init?(coder: NSCoder) {
     self.item = .init("", name: "")
     super.init(coder: coder)
-    setupTableView()
+    setupCollectionView()
+  }
+  
+  override func viewWillAppear(_ animated: Bool) {
+    super.viewWillAppear(animated)
+    getMessages(for: item.id)
   }
 }
 
 extension ChatViewController {
   
-  private func setupTableView() {
-    view.addSubview(tableView)
+  private func setupCollectionView() {
     title = item.name
     view.backgroundColor = .systemBackground
     navigationItem.largeTitleDisplayMode = .never
+    
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
+    collectionView.dataSource = self
+    collectionView.delegate = self
+    collectionView.register(MessageCell.self, forCellWithReuseIdentifier: MessageCell.identifier)
+    view.addSubview(collectionView)
+    self.collectionView = collectionView
     setupConstriants()
   }
   
   private func setupConstriants() {
-    tableView.translatesAutoresizingMaskIntoConstraints = false
+    guard let collectionView else { return }
+    collectionView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
-      tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-      tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+      collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+      collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+      collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+      collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
     ])
   }
 }
 
 extension ChatViewController {
-  
-  private var selfSender: Sender? {
-    guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
-      return nil
-    }
-    let safeEmail = DatabaseManager.shared.safeEmail(email)
-    
-    return Sender(photURL: "", senderId: safeEmail , displayName: "Me")
-  }
   
   private var dateFormatter: DateFormatter {
     let formatter = DateFormatter()
@@ -68,6 +67,47 @@ extension ChatViewController {
     formatter.timeStyle = .long
     formatter.locale = .current
     return formatter
+  }
+}
+
+// MARK: - Get Messages
+
+extension ChatViewController {
+  
+  private func getMessages(for id: String?) {
+    guard let id else { return }
+    
+    DatabaseManager.shared.getAllMessagesForConversation(with: id) { [weak self] result in
+      guard let self else { return }
+      switch result {
+      case .success(let message):
+        guard !message.isEmpty else { return }
+        DispatchQueue.main.async {
+          self.messages = message
+          self.collectionView?.reloadData()
+        }
+      case .failure(let error):
+        debugPrint("Failed to get messages: \(error.localizedDescription)")
+      }
+    }
+  }
+}
+
+// MARK: - CollectionView
+
+extension ChatViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+  
+  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    messages.count
+  }
+  
+  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+    guard let cell = collectionView.dequeueReusableCell(
+      withReuseIdentifier: MessageCell.identifier, for: indexPath) as? MessageCell else {
+      return .init()
+    }
+    cell.configure(messages[indexPath.row])
+    return cell
   }
 }
 

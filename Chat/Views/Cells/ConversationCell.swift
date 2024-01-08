@@ -11,11 +11,9 @@ class ConversationCell: UITableViewCell {
   
   static let identifier = "ConversationCell"
   
-  private lazy var userImageView: UIImageView = {
-    $0.contentMode = .scaleAspectFill
-    $0.layer.masksToBounds = true
+  private lazy var userImageView: AvatarView = {
     return $0
-  }(UIImageView())
+  }(AvatarView())
   
   private lazy var userNameLabel: UILabel = {
     $0.font = .systemFont(ofSize: 18,weight: .semibold)

@@ -91,10 +91,10 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
 extension HomeViewController {
   
   private func navigationBarButtons() {
-    navigationItem.rightBarButtonItem = .init(
-      barButtonSystemItem: .add, target: self, action: #selector(addButtonClicked))
-    navigationItem.leftBarButtonItem = .init(
-      image: .init(systemName: "gear"), style: .done, target: self, action: #selector(profileButtonClicked))
+    navigationItem.rightBarButtonItems = [
+      .init(image: .init(systemName: "gear"), style: .done, target: self, action: #selector(profileButtonClicked)),
+      .init(barButtonSystemItem: .add, target: self, action: #selector(addButtonClicked)),
+    ]
   }
   
   @objc private func profileButtonClicked() {

@@ -74,7 +74,8 @@ extension ProfileViewController {
     guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
       return UIImageView(frame: .zero)
     }
-    let path = "images/" + email + "_profile_picture.png"
+    let safeEmail = DatabaseManager.shared.safeEmail(email)
+    let path = "images/" + safeEmail + "_profile_picture.png"
     
     let imageView = UIImageView(
       frame: .init(x: view.frame.width/3-10,
