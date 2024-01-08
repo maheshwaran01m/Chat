@@ -11,12 +11,11 @@ class NewConversationCell: UITableViewCell {
   
   static let identifier = "NewConversationCell"
   
-  private lazy var userImageView: UIImageView = {
-    $0.contentMode = .scaleAspectFill
-    $0.clipsToBounds = true
+  private lazy var userImageView: AvatarView = {
+    $0.setCornerRadius($0.frame.height/2)
     $0.image = .init(systemName: "photo.circle")
     return $0
-  }(UIImageView())
+  }(AvatarView())
   
   private lazy var userNameLabel: UILabel = {
     $0.font = .systemFont(ofSize: 18,weight: .semibold)
@@ -57,7 +56,6 @@ class NewConversationCell: UITableViewCell {
       userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 10),
       userNameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
     ])
-    userImageView.layer.cornerRadius = userImageView.frame.height/2
   }
 }
 
