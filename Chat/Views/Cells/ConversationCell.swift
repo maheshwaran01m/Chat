@@ -12,6 +12,7 @@ class ConversationCell: UITableViewCell {
   static let identifier = "ConversationCell"
   
   private lazy var userImageView: AvatarView = {
+    $0.image = .init(systemName: "photo.circle")
     return $0
   }(AvatarView())
   
@@ -41,6 +42,7 @@ class ConversationCell: UITableViewCell {
     contentView.addSubview(userImageView)
     contentView.addSubview(userNameLabel)
     contentView.addSubview(userMessageLabel)
+    contentView.backgroundColor = .secondarySystemBackground
     setupConstraints()
   }
   
@@ -52,30 +54,31 @@ class ConversationCell: UITableViewCell {
     NSLayoutConstraint.activate([
       userImageView.topAnchor.constraint(equalTo: topAnchor, constant: 10),
       userImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
-      userImageView.widthAnchor.constraint(equalToConstant: 60),
+      userImageView.widthAnchor.constraint(equalToConstant: 40),
       userImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
       
-      userNameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+      userNameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 5),
       userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 10),
       userNameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
       
-      userMessageLabel.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 10),
-      userMessageLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 10),
+      userMessageLabel.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 5),
+      userMessageLabel.leadingAnchor.constraint(equalTo: userNameLabel.leadingAnchor),
       userMessageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
-      userMessageLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10)
+      userMessageLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5),
     ])
-    userImageView.layer.cornerRadius = userImageView.frame.height/2
   }
   
   func configure(with model: Conversation) {
     userMessageLabel.text = model.latestMessage.text
     userNameLabel.text = model.name
     
-    let path = "images/\(model.otherUserEmail)_profile_picture.png"
-    StorageManager.shared.downloadURL(for: path, completion: {[weak self] result in
+    let safeEmail = DatabaseManager.shared.safeEmail(model.otherUserEmail)
+    let path = "images/\(safeEmail)_profile_picture.png"
+    
+    StorageManager.shared.downloadURL(for: path, completion: { [weak self] result in
       switch result{
       case .success(let url):
-        self?.userImageView.getCachedImage(url.path())
+        self?.userImageView.getCachedImage(url.absoluteString)
         
       case .failure(let error):
         print("Failed to get Image Url: \(error)")
