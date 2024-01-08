@@ -31,9 +31,10 @@ class ChatViewController: UIViewController {
     return $0
   }(UIButton())
   
+  private var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
+  
   private var item: ChatItem
   private var messages = [Message]()
-  private var collectionView: UICollectionView?
   
   init(_ item: ChatItem) {
     self.item = item
@@ -60,18 +61,17 @@ extension ChatViewController {
     view.backgroundColor = .systemBackground
     navigationItem.largeTitleDisplayMode = .never
     
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
     collectionView.dataSource = self
     collectionView.delegate = self
     collectionView.register(MessageCell.self, forCellWithReuseIdentifier: MessageCell.identifier)
+    collectionView.backgroundColor = .systemGroupedBackground
+    
     view.addSubview(collectionView)
-    self.collectionView = collectionView
     setupConstriants()
     setupToolbars()
   }
   
   private func setupConstriants() {
-    guard let collectionView else { return }
     collectionView.translatesAutoresizingMaskIntoConstraints = false
     NSLayoutConstraint.activate([
       collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
@@ -107,7 +107,7 @@ extension ChatViewController {
         guard !message.isEmpty else { return }
         DispatchQueue.main.async {
           self.messages = message
-          self.collectionView?.reloadData()
+          self.collectionView.reloadData()
         }
       case .failure(let error):
         debugPrint("Failed to get messages: \(error.localizedDescription)")
@@ -140,7 +140,7 @@ struct ChatItem {
   let email: String
   var id: String?
   let name: String
-  let isNewConversation: Bool
+  var isNewConversation: Bool
   
   init(_ email: String, id: String? = nil, name: String, isNew: Bool = false) {
     self.email = email
@@ -232,12 +232,12 @@ extension ChatViewController {
     
     guard item.isNewConversation else {
       DatabaseManager.shared.sendMessage(
-        to: createMessageID,
+        to: item.id ?? "",
         otherUserEmail: item.email, 
         name: item.name,
         newMessage: message) { [weak self] created in
           guard let self, created else {
-            print("\n Failed to send")
+            debugPrint("Failed to send")
             return
           }
           self.inputTextField.text = nil
@@ -248,9 +248,13 @@ extension ChatViewController {
       with: item.email, name: item.name,
       firstMessage: message) { [weak self] created in
         guard let self, created else {
-          print("\n Failed to send")
+          debugPrint("Failed to send")
           return
         }
+        self.item.isNewConversation = false
+        let newConversationId = "conversation_\(message.messageId)"
+        self.item.id = newConversationId
+        self.getMessages(for: newConversationId)
         self.inputTextField.text = nil
       }
   }

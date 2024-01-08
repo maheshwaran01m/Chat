@@ -85,7 +85,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
     let item = viewModel.conversations[indexPath.row]
-    let vc = ChatViewController(.init(item.otherUserEmail, name: item.name))
+    let vc = ChatViewController(.init(item.otherUserEmail, id: item.id, name: item.name))
     navigationController?.pushViewController(vc, animated: true)
   }
 }
