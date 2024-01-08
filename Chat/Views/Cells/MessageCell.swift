@@ -36,8 +36,9 @@ class MessageCell: UICollectionViewCell {
     setup()
   }
   
-  func configure(_ message: Message) {
-    updatedUI(using: message)
+  func configure(_ message: Message, item: ChatItem) {
+    updateUI(using: item)
+    updateMessageUI(using: message)
     setupConstraints()
   }
   
@@ -75,35 +76,53 @@ class MessageCell: UICollectionViewCell {
     ])
   }
   
-  private func isCurrentUser(_ message: Message) -> Bool {
+  private func isCurrentUser(_ id: String) -> Bool {
     guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
       return false
     }
-    return DatabaseManager.shared.safeEmail(email) == message.sender.senderId
+    return DatabaseManager.shared.safeEmail(email) == id
   }
   
-  private func updatedUI(using message: Message) {
+  private func updateMessageUI(using message: Message) {
     
     switch message.kind {
     case .photo(let media):
       guard let url = media.url else { return }
       
-      if isCurrentUser(message) {
-        rightImageView.getCachedImage(url.absoluteString)
-        leftImageView.isHidden = true
-        rightImageView.isHidden = false
-        stackView.backgroundColor = .systemBlue
-      } else {
-        leftImageView.getCachedImage(url.absoluteString)
-        leftImageView.isHidden = false
-        rightImageView.isHidden = true
-        stackView.backgroundColor = .secondarySystemBackground
-      }
     case .text(let text):
       messageLabel.text = text
       
     default: break
     }
+  }
+  
+  private func updateUI(using item: ChatItem) {
+    
+    let safeEmail = DatabaseManager.shared.safeEmail(item.email)
+    let filename = safeEmail + "_profile_picture.png"
+    let path = "images/" + filename
+    
+    StorageManager.shared.downloadURL(for: path, completion: { [weak self] result in
+      guard let self else { return }
+      
+      switch result {
+      case .success(let url):
+        if isCurrentUser(safeEmail) {
+          rightImageView.getCachedImage(url.absoluteString)
+          leftImageView.isHidden = true
+          rightImageView.isHidden = false
+          stackView.backgroundColor = .systemBlue
+        } else {
+          leftImageView.getCachedImage(url.absoluteString)
+          leftImageView.isHidden = false
+          rightImageView.isHidden = true
+          stackView.backgroundColor = .secondarySystemBackground
+        }
+        
+      case .failure(let error):
+        print("Failed to get download url: \(error)")
+      }
+    })
   }
 }
 
