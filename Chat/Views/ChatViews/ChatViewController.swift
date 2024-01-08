@@ -31,7 +31,19 @@ class ChatViewController: UIViewController {
     return $0
   }(UIButton())
   
-  private var collectionView = UICollectionView(frame: .zero, collectionViewLayout: .init())
+  private var collectionView: UICollectionView =  {
+    let layout = UICollectionViewFlowLayout()
+    layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+    layout.scrollDirection = .vertical
+    layout.minimumLineSpacing = 4
+    
+    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+    collectionView.register(MessageCell.self, forCellWithReuseIdentifier: MessageCell.identifier)
+    collectionView.contentInsetAdjustmentBehavior = .always
+    collectionView.backgroundColor = .systemGroupedBackground
+    
+    return collectionView
+  }()
   
   private var item: ChatItem
   private var messages = [Message]()
@@ -39,12 +51,15 @@ class ChatViewController: UIViewController {
   init(_ item: ChatItem) {
     self.item = item
     super.init(nibName: nil, bundle: nil)
-    setupCollectionView()
   }
   
   required init?(coder: NSCoder) {
     self.item = .init("", name: "")
     super.init(coder: coder)
+  }
+  
+  override func viewDidLoad() {
+    super.viewDidLoad()
     setupCollectionView()
   }
   
@@ -60,13 +75,10 @@ extension ChatViewController {
     title = item.name
     view.backgroundColor = .systemBackground
     navigationItem.largeTitleDisplayMode = .never
-    
+    view.addSubview(collectionView)
     collectionView.dataSource = self
     collectionView.delegate = self
-    collectionView.register(MessageCell.self, forCellWithReuseIdentifier: MessageCell.identifier)
-    collectionView.backgroundColor = .systemGroupedBackground
     
-    view.addSubview(collectionView)
     setupConstriants()
     setupToolbars()
   }
