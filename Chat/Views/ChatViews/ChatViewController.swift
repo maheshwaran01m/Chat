@@ -9,6 +9,28 @@ import UIKit
 
 class ChatViewController: UIViewController {
   
+  private let containerView: UIView = {
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    $0.backgroundColor = .secondarySystemGroupedBackground
+    $0.layer.borderColor = UIColor.label.cgColor
+    $0.layer.borderWidth = 1
+    return $0
+  }(UIView())
+  
+  private let inputTextField: UITextField = {
+    $0.returnKeyType = .send
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    $0.font = .preferredFont(forTextStyle: .headline)
+    $0.leftView = .init(frame: .init(x: 0, y: 0, width: 10, height: 0))
+    return $0
+  }(UITextField())
+  
+  private let sendButton: UIButton = {
+    $0.setImage(.init(systemName: "paperplane"), for: .normal)
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    return $0
+  }(UIButton())
+  
   private var item: ChatItem
   private var messages = [Message]()
   private var collectionView: UICollectionView?
@@ -45,6 +67,7 @@ extension ChatViewController {
     view.addSubview(collectionView)
     self.collectionView = collectionView
     setupConstriants()
+    setupToolbars()
   }
   
   private func setupConstriants() {
@@ -124,5 +147,111 @@ struct ChatItem {
     self.id = id
     self.name = name
     self.isNewConversation = isNew
+  }
+}
+
+extension ChatViewController {
+  
+  private func setupToolbars() {
+    view.addSubview(containerView)
+    containerView.addSubViews(inputTextField, sendButton)
+    
+    inputTextField.placeholder = "Chat with \(item.name)"
+    inputTextField.delegate = self
+    containerView.setCornerRadius(8)
+    sendButton.addTarget(self, action: #selector(sendButtonClicked), for: .touchUpInside)
+    
+    let padding: CGFloat = 10
+    
+    NSLayoutConstraint.activate([
+      containerView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -padding),
+      containerView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding),
+      containerView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding),
+      containerView.heightAnchor.constraint(equalToConstant: 50),
+      
+      inputTextField.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+      inputTextField.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
+      inputTextField.heightAnchor.constraint(equalTo: containerView.heightAnchor),
+      
+      sendButton.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+      sendButton.leadingAnchor.constraint(equalTo: inputTextField.trailingAnchor, constant: padding),
+      sendButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -padding),
+      sendButton.centerYAnchor.constraint(equalTo: inputTextField.centerYAnchor),
+      sendButton.heightAnchor.constraint(equalTo: containerView.heightAnchor),
+    ])
+  }
+}
+
+extension ChatViewController: UITextFieldDelegate {
+  
+  func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    sendMessageToFirebase()
+    return true
+  }
+  
+  @objc private func sendButtonClicked() {
+    sendMessageToFirebase()
+  }
+}
+
+// MARK: - MessageID
+
+extension ChatViewController {
+  
+  private var createMessageID: String? {
+    guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+      return nil
+    }
+    let dateString = dateFormatter.string(from: Date())
+    let safeCurrentEmail = DatabaseManager.shared.safeEmail(email)
+    
+    let newIdentifier = "\(item.email)_\(safeCurrentEmail)_\(dateString)"
+    return newIdentifier
+  }
+  
+  private var currentUser: SenderType? {
+    guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+      return nil
+    }
+    let safeEmail = DatabaseManager.shared.safeEmail(email)
+    
+    return SenderType(senderId: safeEmail, displayName: "Me")
+  }
+}
+
+// MARK: - Send Message
+
+extension ChatViewController {
+  
+  private func sendMessageToFirebase() {
+    guard let text = inputTextField.text, text.isNotEmpty,
+          let currentUser, let createMessageID else {
+      return
+    }
+    let message = Message(sender: currentUser, messageId: createMessageID, sentDate: Date(), kind: .text(text))
+    
+    guard item.isNewConversation else {
+      DatabaseManager.shared.sendMessage(
+        to: createMessageID,
+        otherUserEmail: item.email, 
+        name: item.name,
+        newMessage: message) { [weak self] created in
+          guard let self, created else {
+            print("\n Failed to send")
+            return
+          }
+          self.inputTextField.text = nil
+        }
+      return
+    }
+    DatabaseManager.shared.createNewConversation(
+      with: item.email, name: item.name,
+      firstMessage: message) { [weak self] created in
+        guard let self, created else {
+          print("\n Failed to send")
+          return
+        }
+        self.inputTextField.text = nil
+      }
   }
 }

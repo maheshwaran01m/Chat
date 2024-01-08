@@ -15,7 +15,7 @@ class HomeViewController: UIViewController {
     $0.register(ConversationCell.self, forCellReuseIdentifier: ConversationCell.identifier)
     $0.tableFooterView = UIView()
     return $0
-  }(UITableView())
+  }(UITableView(frame: .zero, style: .insetGrouped))
 
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -39,6 +39,7 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     view.addSubview(tableView)
     tableView.dataSource = self
     tableView.delegate = self
+    tableView.backgroundColor = .systemBackground
     setupConstriants()
   }
   
@@ -83,6 +84,9 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
+    let item = viewModel.conversations[indexPath.row]
+    let vc = ChatViewController(.init(item.otherUserEmail, name: item.name))
+    navigationController?.pushViewController(vc, animated: true)
   }
 }
 
@@ -129,11 +133,11 @@ extension HomeViewController {
         switch result {
         case .success(let id):
           let vc = ChatViewController(.init(
-            email, id: id, name: value.name, isNew: false))
+            email, id: id, name: value.name))
           self.navigationController?.pushViewController(vc, animated: true)
           
         case .failure:
-          let vc = ChatViewController(.init(email, name: value.name, isNew: false))
+          let vc = ChatViewController(.init(email, name: value.name, isNew: true))
           self.navigationController?.pushViewController(vc, animated: true)
         }
       }
