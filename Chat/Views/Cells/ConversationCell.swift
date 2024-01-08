@@ -13,7 +13,6 @@ class ConversationCell: UITableViewCell {
   
   private lazy var userImageView: UIImageView = {
     $0.contentMode = .scaleAspectFill
-    $0.layer.cornerRadius = 35
     $0.layer.masksToBounds = true
     return $0
   }(UIImageView())
@@ -40,29 +39,34 @@ class ConversationCell: UITableViewCell {
     setupView()
   }
   
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    setupConstraints()
-  }
-  
   private func setupView() {
     contentView.addSubview(userImageView)
     contentView.addSubview(userNameLabel)
     contentView.addSubview(userMessageLabel)
+    setupConstraints()
   }
   
   private func setupConstraints() {
-    userImageView.frame = CGRect(x: 10, y: 10, width: 70, height: 70)
-    userNameLabel.frame = CGRect(
-      x:userImageView.frame.size.width + frame.origin.x + 10, y: 10,
-      width: contentView.frame.size.width - 20 - userImageView.frame.size.width,
-      height: (contentView.frame.size.height-20))
+    userImageView.translatesAutoresizingMaskIntoConstraints = false
+    userNameLabel.translatesAutoresizingMaskIntoConstraints = false
+    userMessageLabel.translatesAutoresizingMaskIntoConstraints = false
     
-    userMessageLabel.frame = CGRect(
-      x:userImageView.frame.size.width + frame.origin.x+10,
-      y: userNameLabel.frame.height + frame.origin.y + 10,
-      width: contentView.frame.size.width - 20 - userImageView.frame.size.width,
-      height: (contentView.frame.size.height-20))
+    NSLayoutConstraint.activate([
+      userImageView.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+      userImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+      userImageView.widthAnchor.constraint(equalToConstant: 60),
+      userImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
+      
+      userNameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+      userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 10),
+      userNameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+      
+      userMessageLabel.topAnchor.constraint(equalTo: userNameLabel.bottomAnchor, constant: 10),
+      userMessageLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 10),
+      userMessageLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+      userMessageLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10)
+    ])
+    userImageView.layer.cornerRadius = userImageView.frame.height/2
   }
   
   func configure(with model: Conversation) {

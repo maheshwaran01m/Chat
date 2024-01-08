@@ -13,8 +13,8 @@ class NewConversationCell: UITableViewCell {
   
   private lazy var userImageView: UIImageView = {
     $0.contentMode = .scaleAspectFill
-    $0.layer.cornerRadius = 35
-    $0.layer.masksToBounds = true
+    $0.clipsToBounds = true
+    $0.image = .init(systemName: "photo.circle")
     return $0
   }(UIImageView())
   
@@ -44,11 +44,20 @@ class NewConversationCell: UITableViewCell {
   }
   
   private func setupConstraints() {
-    userImageView.frame = CGRect(x: 10, y: 10, width: 70, height: 70)
-    userNameLabel.frame = CGRect(
-      x:userImageView.frame.size.width + frame.origin.x + 10, y: 10,
-      width: contentView.frame.size.width - 20 - userImageView.frame.size.width,
-      height: 50)
+    userImageView.translatesAutoresizingMaskIntoConstraints = false
+    userNameLabel.translatesAutoresizingMaskIntoConstraints = false
+    
+    NSLayoutConstraint.activate([
+      userImageView.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+      userImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+      userImageView.widthAnchor.constraint(equalToConstant: 50),
+      userImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
+      
+      userNameLabel.centerYAnchor.constraint(equalTo: userImageView.centerYAnchor),
+      userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 10),
+      userNameLabel.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+    ])
+    userImageView.layer.cornerRadius = userImageView.frame.height/2
   }
 }
 
@@ -67,6 +76,7 @@ extension NewConversationCell {
         print("Failed to get Image Url: \(error)")
       }
     })
+    setupConstraints()
   }
 }
 
