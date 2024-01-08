@@ -34,6 +34,7 @@ extension ChatViewController {
   
   private func setupTableView() {
     view.addSubview(tableView)
+    title = item.name
     view.backgroundColor = .systemBackground
     navigationItem.largeTitleDisplayMode = .never
     setupConstriants()

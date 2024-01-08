@@ -91,8 +91,7 @@ extension NewConversationViewController: UITableViewDelegate, UITableViewDataSou
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
-    
-    dismiss(animated: true) { [weak self] in
+    navigationController?.dismiss(animated: true) { [weak self] in
       guard let self else { return }
       self.results?(records[indexPath.row])
     }
@@ -108,7 +107,8 @@ extension NewConversationViewController {
     NSLayoutConstraint.activate([
       noResultsLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
       noResultsLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-      noResultsLabel.heightAnchor.constraint(equalToConstant: 44)
+      noResultsLabel.heightAnchor.constraint(equalToConstant: 44),
+      noResultsLabel.widthAnchor.constraint(equalTo: view.widthAnchor, constant: 10)
     ])
   }
   
