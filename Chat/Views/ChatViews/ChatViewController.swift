@@ -170,7 +170,7 @@ extension ChatViewController {
     
     inputTextField.placeholder = "Chat with \(item.name)"
     inputTextField.delegate = self
-    containerView.setCornerRadius(8)
+    containerView.setCornerRadius(25)
     sendButton.addTarget(self, action: #selector(sendButtonClicked), for: .touchUpInside)
     
     let padding: CGFloat = 10
