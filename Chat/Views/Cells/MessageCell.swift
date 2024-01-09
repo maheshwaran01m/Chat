@@ -7,27 +7,57 @@
 
 import UIKit
 
-class MessageCell: UICollectionViewCell {
+class MessageCell: UITableViewCell {
   
   static let identifier = "MessageCell"
   
-  private let stackView: UIStackView = {
-    $0.spacing = 5
+  private let containerView: UIView = {
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    $0.backgroundColor = .clear
     return $0
-  }(UIStackView())
+  }(UIView())
   
-  private let leftImageView = AvatarView()
+  private let senderView: UIView = {
+    $0.backgroundColor = .systemBlue
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    return $0
+  }(UIView())
   
-  private let rightImageView = AvatarView()
+  private let receiverView: UIView = {
+    $0.backgroundColor = .secondarySystemBackground
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    return $0
+  }(UIView())
   
   private let messageLabel: UILabel = {
     $0.font = .systemFont(ofSize: 14,weight: .regular)
+    $0.translatesAutoresizingMaskIntoConstraints = false
     $0.numberOfLines = 0
     return $0
   }(UILabel())
   
-  override init(frame: CGRect) {
-    super.init(frame: frame)
+  private let stackView: UIStackView = {
+    $0.spacing = 5
+    $0.axis = .horizontal
+    return $0
+  }(UIStackView())
+  
+  private let leftImageView: AvatarView = {
+    $0.image = .init(systemName: "photo.circle")
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    return $0
+  }(AvatarView())
+  
+  private let rightImageView: AvatarView = {
+    $0.image = .init(systemName: "photo.circle")
+    $0.translatesAutoresizingMaskIntoConstraints = false
+    return $0
+  }(AvatarView())
+  
+  // MARK: - Init
+  
+  override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+    super.init(style: style, reuseIdentifier: reuseIdentifier)
     setup()
   }
   
@@ -36,51 +66,82 @@ class MessageCell: UICollectionViewCell {
     setup()
   }
   
-  func configure(_ message: Message, item: ChatItem) {
-    updateUI(using: item)
+  // MARK: - Configure View
+  
+  func configure(_ message: Message) {
     updateMessageUI(using: message)
-    setupConstraints()
+    updateImage(using: message)
+    setupViewConstraints(for: message)
   }
   
   private func setup() {
-    contentView.addSubview(stackView)
-    stackView.addArrangedSubview(leftImageView)
-    stackView.addArrangedSubview(messageLabel)
-    stackView.addArrangedSubview(rightImageView)
+    contentView.addSubview(containerView)
+    separatorInset.right = .greatestFiniteMagnitude
+    backgroundColor = .clear
     
-    stackView.translatesAutoresizingMaskIntoConstraints = false
-    leftImageView.translatesAutoresizingMaskIntoConstraints = false
-    rightImageView.translatesAutoresizingMaskIntoConstraints = false
-    messageLabel.translatesAutoresizingMaskIntoConstraints = false
+    containerView.edges(to: contentView)
+    setupConstraints()
   }
   
   private func setupConstraints() {
-    
+    let padding: CGFloat = 5
     NSLayoutConstraint.activate([
-      stackView.topAnchor.constraint(equalTo: topAnchor),
-      stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
-      stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-      stackView.bottomAnchor.constraint(equalTo: bottomAnchor),
-      
-      leftImageView.leadingAnchor.constraint(equalTo: stackView.leadingAnchor, constant: 5),
-      leftImageView.topAnchor.constraint(equalTo: stackView.topAnchor, constant: 5),
-      leftImageView.centerYAnchor.constraint(equalTo: stackView.centerYAnchor),
-      
-      messageLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
-      messageLabel.leadingAnchor.constraint(equalTo: leftImageView.trailingAnchor, constant: 5),
-      messageLabel.bottomAnchor.constraint(equalTo: stackView.bottomAnchor, constant: -12),
-      
-      rightImageView.leadingAnchor.constraint(equalTo: messageLabel.trailingAnchor, constant: 5),
-      rightImageView.topAnchor.constraint(equalTo: stackView.topAnchor, constant: 5),
-      rightImageView.centerYAnchor.constraint(equalTo: stackView.centerYAnchor),
+      containerView.topAnchor.constraint(equalTo: topAnchor, constant: padding),
+      containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
+      containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
+      containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding),
     ])
   }
   
-  private func isCurrentUser(_ id: String) -> Bool {
-    guard let email = UserDefaults.standard.value(forKey: "email") as? String else {
+  // MARK: - Custom Methods
+  
+  private func setupViewConstraints(for item: Message) {
+    let padding: CGFloat = 5
+    
+    if isCurrentUser(item.sender.senderId) {
+      containerView.addSubview(senderView)
+      senderView.addSubViews(rightImageView, messageLabel)
+      
+      senderView.setCornerRadius(16)
+      
+      NSLayoutConstraint.activate([
+        rightImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -padding),
+        rightImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding),
+        rightImageView.widthAnchor.constraint(equalToConstant: 40),
+        rightImageView.widthAnchor.constraint(equalToConstant: 40),
+        
+        senderView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding),
+        senderView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding),
+        
+        messageLabel.topAnchor.constraint(equalTo: senderView.topAnchor),
+        messageLabel.bottomAnchor.constraint(equalTo: senderView.bottomAnchor),
+        messageLabel.widthAnchor.constraint(equalToConstant: messageLabel.intrinsicContentSize.width + 10)
+      ])
+    } else {
+      containerView.addSubview(receiverView)
+      receiverView.addSubViews(leftImageView, messageLabel)
+      
+      NSLayoutConstraint.activate([
+        leftImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
+        leftImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding),
+        leftImageView.widthAnchor.constraint(equalToConstant: 40),
+        leftImageView.widthAnchor.constraint(equalToConstant: 40),
+        
+        receiverView.topAnchor.constraint(equalTo: containerView.topAnchor),
+        receiverView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding),
+        
+        messageLabel.topAnchor.constraint(equalTo: receiverView.topAnchor),
+        messageLabel.bottomAnchor.constraint(equalTo: receiverView.bottomAnchor),
+        messageLabel.widthAnchor.constraint(equalToConstant: messageLabel.intrinsicContentSize.width + 10)
+      ])
+    }
+  }
+  
+  private func isCurrentUser(_ email: String) -> Bool {
+    guard let currentEmail = UserDefaults.standard.value(forKey: "email") as? String else {
       return false
     }
-    return DatabaseManager.shared.safeEmail(email) == id
+    return DatabaseManager.shared.safeEmail(currentEmail) == email
   }
   
   private func updateMessageUI(using message: Message) {
@@ -96,9 +157,9 @@ class MessageCell: UICollectionViewCell {
     }
   }
   
-  private func updateUI(using item: ChatItem) {
+  private func updateImage(using item: Message) {
     
-    let safeEmail = DatabaseManager.shared.safeEmail(item.email)
+    let safeEmail = item.sender.senderId
     let filename = safeEmail + "_profile_picture.png"
     let path = "images/" + filename
     
@@ -107,16 +168,10 @@ class MessageCell: UICollectionViewCell {
       
       switch result {
       case .success(let url):
-        if isCurrentUser(safeEmail) {
+        if isCurrentUser(item.sender.senderId) {
           rightImageView.getCachedImage(url.absoluteString)
-          leftImageView.isHidden = true
-          rightImageView.isHidden = false
-          stackView.backgroundColor = .systemBlue
         } else {
           leftImageView.getCachedImage(url.absoluteString)
-          leftImageView.isHidden = false
-          rightImageView.isHidden = true
-          stackView.backgroundColor = .secondarySystemBackground
         }
         
       case .failure(let error):

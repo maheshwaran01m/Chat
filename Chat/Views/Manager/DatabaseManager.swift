@@ -346,7 +346,7 @@ extension DatabaseManager {
       }
       
       let messageDate = newMessage.sentDate
-      let dateString = dateFormatter.string(from: messageDate)
+      let dateString = dateFormatter.string(from: messageDate ?? Date())
       
       var message = ""
       
@@ -544,6 +544,7 @@ struct Message {
   var messageId: String
   var sentDate: Date
   var kind: MessageKind
+  var isRead: Bool = false
 }
 
 struct SenderType {
@@ -785,14 +786,12 @@ extension DatabaseManager {
         let messages: [Message] = value.compactMap { dictionary in
           
           guard let name = dictionary["name"] as? String,
-                /*let isRead = dictionary["is_read"] as? Bool,*/
+                let isRead = dictionary["is_read"] as? Bool,
                 let messageID = dictionary["id"] as? String,
                 let content = dictionary["content"] as? String,
                 let senderEmail = dictionary["sender_email"] as? String,
                 let dateString = dictionary["date"] as? String,
-                let type = dictionary["type"] as? String,
-                //date
-                let date = self.dateFormatter.date(from: dateString) else {
+                let type = dictionary["type"] as? String else {
             return nil
           }
           
@@ -826,12 +825,11 @@ extension DatabaseManager {
           } else {
             kind = .text(content)
           }
-          guard let finalKind = kind else {
-            return nil
-          }
+          guard let finalKind = kind else { return nil }
           let sender = SenderType(senderId: senderEmail, displayName: name)
           
-          return Message(sender: sender, messageId: messageID, sentDate: date, kind: finalKind)
+          let date = self.dateFormatter.date(from: dateString) ?? .now
+          return Message(sender: sender, messageId: messageID, sentDate: date, kind: finalKind, isRead: isRead)
         }
         
         completion(.success(messages))
