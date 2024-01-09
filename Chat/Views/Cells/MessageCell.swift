@@ -87,7 +87,7 @@ class MessageCell: UICollectionViewCell {
     
     switch message.kind {
     case .photo(let media):
-      guard let url = media.url else { return }
+      guard let _ = media.url else { return }
       
     case .text(let text):
       messageLabel.text = text
