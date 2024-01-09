@@ -31,19 +31,11 @@ class ChatViewController: UIViewController {
     return $0
   }(UIButton())
   
-  private var collectionView: UICollectionView =  {
-    let layout = UICollectionViewFlowLayout()
-    layout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
-    layout.scrollDirection = .vertical
-    layout.minimumLineSpacing = 4
-    
-    let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-    collectionView.register(MessageCell.self, forCellWithReuseIdentifier: MessageCell.identifier)
-    collectionView.contentInsetAdjustmentBehavior = .always
-    collectionView.backgroundColor = .systemGroupedBackground
-    
-    return collectionView
-  }()
+  private let tableView: UITableView = {
+    $0.register(MessageCell.self, forCellReuseIdentifier: MessageCell.identifier)
+    $0.backgroundColor = .systemBackground
+    return $0
+  }(UITableView())
   
   private var item: ChatItem
   private var messages = [Message]()
@@ -75,22 +67,11 @@ extension ChatViewController {
     title = item.name
     view.backgroundColor = .systemBackground
     navigationItem.largeTitleDisplayMode = .never
-    view.addSubview(collectionView)
-    collectionView.dataSource = self
-    collectionView.delegate = self
-    
-    setupConstriants()
+    view.addSubview(tableView)
+    tableView.dataSource = self
+    tableView.delegate = self
+    tableView.edges(to: view)
     setupToolbars()
-  }
-  
-  private func setupConstriants() {
-    collectionView.translatesAutoresizingMaskIntoConstraints = false
-    NSLayoutConstraint.activate([
-      collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-      collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-      collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-      collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-    ])
   }
 }
 
@@ -119,7 +100,7 @@ extension ChatViewController {
         guard !message.isEmpty else { return }
         DispatchQueue.main.async {
           self.messages = message
-          self.collectionView.reloadData()
+          self.tableView.reloadData()
         }
       case .failure(let error):
         debugPrint("Failed to get messages: \(error.localizedDescription)")
@@ -130,18 +111,18 @@ extension ChatViewController {
 
 // MARK: - CollectionView
 
-extension ChatViewController: UICollectionViewDelegate, UICollectionViewDataSource {
+extension ChatViewController: UITableViewDelegate, UITableViewDataSource {
   
-  func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+  func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
     messages.count
   }
   
-  func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-    guard let cell = collectionView.dequeueReusableCell(
-      withReuseIdentifier: MessageCell.identifier, for: indexPath) as? MessageCell else {
+  func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    guard let cell = tableView.dequeueReusableCell(
+      withIdentifier: MessageCell.identifier, for: indexPath) as? MessageCell else {
       return .init()
     }
-    cell.configure(messages[indexPath.row], item: item)
+    cell.configure(messages[indexPath.row])
     return cell
   }
 }
