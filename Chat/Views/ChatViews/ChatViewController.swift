@@ -125,6 +125,10 @@ extension ChatViewController: UITableViewDelegate, UITableViewDataSource {
     cell.configure(messages[indexPath.row])
     return cell
   }
+  
+  func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    tableView.deselectRow(at: indexPath, animated: true)
+  }
 }
 
 // MARK: - ChatItem
