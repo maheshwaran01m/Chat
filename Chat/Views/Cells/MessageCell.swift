@@ -45,11 +45,17 @@ class MessageCell: UITableViewCell {
     selectedBackgroundView = clearView
   }
   
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    updateCornerRadius()
+  }
+  
   // MARK: - Configure View
   
   func configure(_ message: Message) {
     updateMessageUI(using: message)
     setupViewConstraints(isCurrentUser(message.sender.senderId))
+    setupConstraints()
   }
   
   private func setup() {
@@ -69,16 +75,24 @@ class MessageCell: UITableViewCell {
       stackView.topAnchor.constraint(equalTo: topAnchor, constant: padding),
       stackView.bottomAnchor.constraint(equalTo: bottomAnchor,constant: -padding),
     ])
-    stackView.layoutMargins = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
-    stackView.isLayoutMarginsRelativeArrangement = true
-    stackView.setCornerRadius(16)
-    stackView.layer.borderWidth = 1
-    stackView.layer.borderColor = UIColor.white.cgColor
-    stackView.setCornerRadius(15)
+    
+    updateCornerRadius(padding)
   }
     
   
   // MARK: - Custom Methods
+  
+  private func updateCornerRadius(_ padding: CGFloat = 10) {
+    stackView.layoutMargins = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
+    stackView.isLayoutMarginsRelativeArrangement = true
+    
+    stackView.setCornerRadius(16)
+    if currentMode == .dark {
+      stackView.layer.borderWidth = 1
+      stackView.layer.borderColor = UIColor.white.cgColor
+      stackView.setCornerRadius(15)
+    }
+  }
   
   private func setupViewConstraints(_ isCurrentUser: Bool) {
     let padding: CGFloat = 10
