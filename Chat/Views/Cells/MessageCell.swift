@@ -13,8 +13,6 @@ class MessageCell: UITableViewCell {
   
   private let stackView: UIStackView = {
     $0.translatesAutoresizingMaskIntoConstraints = false
-    $0.spacing = 5
-    $0.distribution = .equalSpacing
     $0.axis = .horizontal
     return $0
   }(UIStackView())
