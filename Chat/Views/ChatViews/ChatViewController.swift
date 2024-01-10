@@ -12,7 +12,7 @@ class ChatViewController: UIViewController {
   private let containerView: UIView = {
     $0.translatesAutoresizingMaskIntoConstraints = false
     $0.backgroundColor = .secondarySystemGroupedBackground
-    $0.layer.borderColor = UIColor.label.cgColor
+    $0.layer.borderColor = currentMode == .dark ? UIColor.systemBlue.cgColor : UIColor.label.cgColor
     $0.layer.borderWidth = 1
     return $0
   }(UIView())
@@ -58,6 +58,11 @@ class ChatViewController: UIViewController {
   override func viewWillAppear(_ animated: Bool) {
     super.viewWillAppear(animated)
     getMessages(for: item.id)
+  }
+  
+  override func viewDidLayoutSubviews() {
+    super.viewDidLayoutSubviews()
+    updateDarkMode()
   }
 }
 
@@ -176,6 +181,10 @@ extension ChatViewController {
       sendButton.centerYAnchor.constraint(equalTo: inputTextField.centerYAnchor),
       sendButton.heightAnchor.constraint(equalTo: containerView.heightAnchor),
     ])
+  }
+  
+  private func updateDarkMode() {
+    containerView.layer.borderColor = currentMode == .dark ? UIColor.white.cgColor : UIColor.label.cgColor
   }
 }
 

@@ -7,6 +7,10 @@
 
 import UIKit
 
+var currentMode: UIUserInterfaceStyle {
+  UITraitCollection.current.userInterfaceStyle
+}
+
 extension UIViewController {
   
   func resignFirstResponderForView(_ views: UIView...) {
