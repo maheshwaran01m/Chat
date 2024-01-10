@@ -72,6 +72,9 @@ class MessageCell: UITableViewCell {
     stackView.layoutMargins = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
     stackView.isLayoutMarginsRelativeArrangement = true
     stackView.setCornerRadius(16)
+    stackView.layer.borderWidth = 1
+    stackView.layer.borderColor = UIColor.white.cgColor
+    stackView.setCornerRadius(15)
   }
     
   
