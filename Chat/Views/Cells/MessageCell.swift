@@ -11,48 +11,20 @@ class MessageCell: UITableViewCell {
   
   static let identifier = "MessageCell"
   
-  private let containerView: UIView = {
-    $0.translatesAutoresizingMaskIntoConstraints = false
-    $0.backgroundColor = .clear
-    return $0
-  }(UIView())
-  
-  private let senderView: UIView = {
-    $0.backgroundColor = .systemBlue
-    $0.translatesAutoresizingMaskIntoConstraints = false
-    return $0
-  }(UIView())
-  
-  private let receiverView: UIView = {
-    $0.backgroundColor = .secondarySystemBackground
-    $0.translatesAutoresizingMaskIntoConstraints = false
-    return $0
-  }(UIView())
-  
-  private let messageLabel: UILabel = {
-    $0.font = .systemFont(ofSize: 14,weight: .regular)
-    $0.translatesAutoresizingMaskIntoConstraints = false
-    $0.numberOfLines = 0
-    return $0
-  }(UILabel())
-  
   private let stackView: UIStackView = {
+    $0.translatesAutoresizingMaskIntoConstraints = false
     $0.spacing = 5
+    $0.distribution = .equalSpacing
     $0.axis = .horizontal
     return $0
   }(UIStackView())
   
-  private let leftImageView: AvatarView = {
-    $0.image = .init(systemName: "photo.circle")
+  private let messageLabel: UILabel = {
+    $0.font = .systemFont(ofSize: 14, weight: .regular)
     $0.translatesAutoresizingMaskIntoConstraints = false
+    $0.numberOfLines = 0
     return $0
-  }(AvatarView())
-  
-  private let rightImageView: AvatarView = {
-    $0.image = .init(systemName: "photo.circle")
-    $0.translatesAutoresizingMaskIntoConstraints = false
-    return $0
-  }(AvatarView())
+  }(UILabel())
   
   // MARK: - Init
   
@@ -66,74 +38,59 @@ class MessageCell: UITableViewCell {
     setup()
   }
   
+  override func setSelected(_ selected: Bool, animated: Bool) {
+    super.setSelected(selected, animated: animated)
+    let clearView = UIView()
+    clearView.backgroundColor = .clear
+    selectedBackgroundView = clearView
+  }
+  
   // MARK: - Configure View
   
   func configure(_ message: Message) {
     updateMessageUI(using: message)
-    updateImage(using: message)
-    setupViewConstraints(for: message)
+    setupViewConstraints(isCurrentUser(message.sender.senderId))
   }
   
   private func setup() {
-    contentView.addSubview(containerView)
     separatorInset.right = .greatestFiniteMagnitude
     backgroundColor = .clear
-    
-    containerView.edges(to: contentView)
     setupConstraints()
   }
   
   private func setupConstraints() {
-    let padding: CGFloat = 5
+    let padding: CGFloat = 10
+    
+    contentView.addSubview(stackView)
+    stackView.translatesAutoresizingMaskIntoConstraints = false
+    stackView.addArrangedSubview(messageLabel)
+    
     NSLayoutConstraint.activate([
-      containerView.topAnchor.constraint(equalTo: topAnchor, constant: padding),
-      containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
-      containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
-      containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -padding),
+      stackView.topAnchor.constraint(equalTo: topAnchor, constant: padding),
+      stackView.bottomAnchor.constraint(equalTo: bottomAnchor,constant: -padding),
     ])
+    stackView.layoutMargins = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
+    stackView.isLayoutMarginsRelativeArrangement = true
+    stackView.setCornerRadius(16)
   }
+    
   
   // MARK: - Custom Methods
   
-  private func setupViewConstraints(for item: Message) {
-    let padding: CGFloat = 5
+  private func setupViewConstraints(_ isCurrentUser: Bool) {
+    let padding: CGFloat = 10
     
-    if isCurrentUser(item.sender.senderId) {
-      containerView.addSubview(senderView)
-      senderView.addSubViews(rightImageView, messageLabel)
-      
-      senderView.setCornerRadius(16)
-      
+    if isCurrentUser {
       NSLayoutConstraint.activate([
-        rightImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -padding),
-        rightImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding),
-        rightImageView.widthAnchor.constraint(equalToConstant: 40),
-        rightImageView.widthAnchor.constraint(equalToConstant: 40),
-        
-        senderView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding),
-        senderView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding),
-        
-        messageLabel.topAnchor.constraint(equalTo: senderView.topAnchor),
-        messageLabel.bottomAnchor.constraint(equalTo: senderView.bottomAnchor),
-        messageLabel.widthAnchor.constraint(equalToConstant: messageLabel.intrinsicContentSize.width + 10)
+        stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -padding),
       ])
+      stackView.backgroundColor = .systemBlue
+      messageLabel.textColor = .white
     } else {
-      containerView.addSubview(receiverView)
-      receiverView.addSubViews(leftImageView, messageLabel)
-      
       NSLayoutConstraint.activate([
-        leftImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: padding),
-        leftImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: padding),
-        leftImageView.widthAnchor.constraint(equalToConstant: 40),
-        leftImageView.widthAnchor.constraint(equalToConstant: 40),
-        
-        receiverView.topAnchor.constraint(equalTo: containerView.topAnchor),
-        receiverView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -padding),
-        
-        messageLabel.topAnchor.constraint(equalTo: receiverView.topAnchor),
-        messageLabel.bottomAnchor.constraint(equalTo: receiverView.bottomAnchor),
-        messageLabel.widthAnchor.constraint(equalToConstant: messageLabel.intrinsicContentSize.width + 10)
+        stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: padding),
       ])
+      stackView.backgroundColor = .systemGroupedBackground
     }
   }
   
@@ -155,29 +112,6 @@ class MessageCell: UITableViewCell {
       
     default: break
     }
-  }
-  
-  private func updateImage(using item: Message) {
-    
-    let safeEmail = item.sender.senderId
-    let filename = safeEmail + "_profile_picture.png"
-    let path = "images/" + filename
-    
-    StorageManager.shared.downloadURL(for: path, completion: { [weak self] result in
-      guard let self else { return }
-      
-      switch result {
-      case .success(let url):
-        if isCurrentUser(item.sender.senderId) {
-          rightImageView.getCachedImage(url.absoluteString)
-        } else {
-          leftImageView.getCachedImage(url.absoluteString)
-        }
-        
-      case .failure(let error):
-        print("Failed to get download url: \(error)")
-      }
-    })
   }
 }
 
