@@ -8,7 +8,6 @@
 import UIKit
 
 protocol ConversationViewModelDelegate: AnyObject {
-  
   func updateUI()
 }
 
@@ -17,7 +16,6 @@ class ConversationViewModel {
   var conversations = [Conversation]()
   
   weak var delegate: ConversationViewModelDelegate?
-  
   
   init() {
     getConversations()
