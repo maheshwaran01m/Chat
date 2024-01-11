@@ -31,8 +31,7 @@ extension UIView {
   
   func setCornerRadius(_ radius: CGFloat? = nil) {
     guard let radius else {
-      let cornerRadius = min(frame.width, frame.height)
-      layer.cornerRadius = cornerRadius/2
+      layer.cornerRadius = frame.size.height/2
       layer.masksToBounds = true
       return
     }

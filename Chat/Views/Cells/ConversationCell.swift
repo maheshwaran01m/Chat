@@ -52,10 +52,10 @@ class ConversationCell: UITableViewCell {
     userMessageLabel.translatesAutoresizingMaskIntoConstraints = false
     
     NSLayoutConstraint.activate([
-      userImageView.topAnchor.constraint(equalTo: topAnchor, constant: 10),
+      userImageView.topAnchor.constraint(equalTo: topAnchor, constant: 5),
       userImageView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
       userImageView.widthAnchor.constraint(equalToConstant: 40),
-      userImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -10),
+      userImageView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -5),
       
       userNameLabel.topAnchor.constraint(equalTo: topAnchor, constant: 5),
       userNameLabel.leadingAnchor.constraint(equalTo: userImageView.trailingAnchor, constant: 10),
