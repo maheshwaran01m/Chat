@@ -346,7 +346,7 @@ extension DatabaseManager {
       }
       
       let messageDate = newMessage.sentDate
-      let dateString = dateFormatter.string(from: messageDate ?? Date())
+      let dateString = dateFormatter.string(from: messageDate)
       
       var message = ""
       
@@ -356,12 +356,12 @@ extension DatabaseManager {
         message = messageText
         
       case .photo(let mediaItem):
-        if let targetUrlString = mediaItem.url?.absoluteString{
+        if let targetUrlString = mediaItem.url?.absoluteString {
           message = targetUrlString
         }
         break
       case .video(let mediaItem):
-        if let targetUrlString = mediaItem.url?.absoluteString{
+        if let targetUrlString = mediaItem.url?.absoluteString {
           message = targetUrlString
         }
         

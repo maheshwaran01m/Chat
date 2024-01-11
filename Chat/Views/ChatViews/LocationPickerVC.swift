@@ -20,11 +20,13 @@ class LocationPickerVC: UIViewController {
   }(MKMapView())
   
   init(_ coordinates: CLLocationCoordinate2D? = nil,
+       title: String = "Pick Location",
        result: ((CLLocationCoordinate2D) -> Void)? = nil) {
     self.coordinates = coordinates
     self.result = result
     self.isPickable = coordinates == nil
     super.init(nibName: nil, bundle: nil)
+    self.title = title
   }
   
   required init?(coder: NSCoder) {
@@ -39,6 +41,7 @@ class LocationPickerVC: UIViewController {
   
   private func setupView() {
     view.backgroundColor = .systemBackground
+    navigationItem.largeTitleDisplayMode = .never
     
     if isPickable {
       navigationItem.rightBarButtonItem = .init(

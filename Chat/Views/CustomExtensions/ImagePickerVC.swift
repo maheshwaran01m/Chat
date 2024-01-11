@@ -15,10 +15,10 @@ class ImagePickerVC: NSObject, UIImagePickerControllerDelegate, UINavigationCont
   
   weak var delegate: ImagePickerViewDelegate?
   
-  func presentImagePicker(_ vc: UIViewController) {
+  func presentImagePicker(_ vc: UIViewController, title: String = "Profile Picture") {
     
     let actionSheet = UIAlertController(
-      title: "Profile Picture",
+      title: title,
       message: "How would you like to select a Picture",
       preferredStyle: .actionSheet)
     

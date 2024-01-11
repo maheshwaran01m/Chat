@@ -59,6 +59,7 @@
 		9D30438F2B4ADF62005C16C5 /* LocationPickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D30438E2B4ADF62005C16C5 /* LocationPickerVC.swift */; };
 		9D3043912B4AE1CC005C16C5 /* PhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043902B4AE1CC005C16C5 /* PhotoViewController.swift */; };
 		9D3043932B4BB608005C16C5 /* AvatarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3043922B4BB608005C16C5 /* AvatarView.swift */; };
+		9D928E142B4F889B00DBCC96 /* ChatPickerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D928E132B4F889B00DBCC96 /* ChatPickerVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -89,6 +90,7 @@
 		9D30438E2B4ADF62005C16C5 /* LocationPickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationPickerVC.swift; sourceTree = "<group>"; };
 		9D3043902B4AE1CC005C16C5 /* PhotoViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewController.swift; sourceTree = "<group>"; };
 		9D3043922B4BB608005C16C5 /* AvatarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvatarView.swift; sourceTree = "<group>"; };
+		9D928E132B4F889B00DBCC96 /* ChatPickerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatPickerVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -199,6 +201,7 @@
 				9D30436F2B4A7029005C16C5 /* AlertVC.swift */,
 				9D3043712B4A731F005C16C5 /* Strings+Extensions.swift */,
 				9D3043922B4BB608005C16C5 /* AvatarView.swift */,
+				9D928E132B4F889B00DBCC96 /* ChatPickerVC.swift */,
 			);
 			path = CustomExtensions;
 			sourceTree = "<group>";
@@ -375,6 +378,7 @@
 				9D3043842B4AA68A005C16C5 /* ChatViewController.swift in Sources */,
 				9D3043792B4A8666005C16C5 /* LoginViewController.swift in Sources */,
 				9D3043892B4AC03E005C16C5 /* NewConversationCell.swift in Sources */,
+				9D928E142B4F889B00DBCC96 /* ChatPickerVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
