@@ -77,15 +77,13 @@ extension ProfileViewController {
     let safeEmail = DatabaseManager.shared.safeEmail(email)
     let path = "images/" + safeEmail + "_profile_picture.png"
     
-    let imageView = UIImageView(
+    let imageView = AvatarView(
       frame: .init(x: view.frame.width/3-10,
                    y: 0, width: view.frame.width/3, height: view.frame.width/3))
     imageView.contentMode = .scaleAspectFill
     imageView.image = .init(systemName: "person.circle")
-    imageView.layer.borderColor = UIColor.white.cgColor
+    imageView.layer.borderColor = UIColor.systemGray.cgColor
     imageView.layer.borderWidth = 1
-    imageView.layer.masksToBounds = true
-    imageView.layer.cornerRadius = imageView.frame.width/2
     
     StorageManager.shared.downloadURL(for: path, completion: { result in
       switch result {
