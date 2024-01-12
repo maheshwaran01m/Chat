@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import AVKit
 
 class ChatViewController: UIViewController {
   
@@ -141,6 +142,32 @@ extension ChatViewController: UITableViewDelegate, UITableViewDataSource {
   
   func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
     tableView.deselectRow(at: indexPath, animated: true)
+    didSelectMessage(messages[indexPath.row])
+  }
+  
+  // MARK: - Message Selection
+  
+  func didSelectMessage(_ message: Message) {
+    switch message.kind {
+      
+    case .location(let location):
+      let locationVC = LocationPickerVC(location.location.coordinate, title: "Location")
+      navigationController?.pushViewController(locationVC, animated: true)
+      
+    case .photo(let media):
+      guard let url = media.url else { return }
+      let vc = PhotoViewController(url)
+      navigationController?.pushViewController(vc, animated: true)
+      
+    case .video(let media):
+      guard let url = media.url else { return }
+      let vc = AVPlayerViewController()
+      vc.player = .init(url: url)
+      vc.allowsPictureInPicturePlayback = true
+      present(vc, animated: true)
+      
+    default: break
+    }
   }
 }
 
@@ -254,11 +281,11 @@ extension ChatViewController {
     guard item.isNewConversation else {
       DatabaseManager.shared.sendMessage(
         to: item.id ?? "",
-        otherUserEmail: item.email, 
+        otherUserEmail: item.email,
         name: item.name,
         newMessage: message) { [weak self] created in
           guard let self, created else {
-            debugPrint("Failed to send")
+            debugPrint("Failed to send text message")
             return
           }
           self.inputTextField.text = nil
@@ -269,7 +296,7 @@ extension ChatViewController {
       with: item.email, name: item.name,
       firstMessage: message) { [weak self] created in
         guard let self, created else {
-          debugPrint("Failed to send")
+          debugPrint("Failed to send text message")
           return
         }
         self.item.isNewConversation = false
@@ -316,7 +343,7 @@ extension ChatViewController: ChatPickerDelegate {
           name: item.name,
           newMessage: message) { [weak self] created in
             guard let self, created else {
-              debugPrint("Failed to send")
+              debugPrint("Failed to send photo message")
               return
             }
             self.item.isNewConversation = false
@@ -327,7 +354,7 @@ extension ChatViewController: ChatPickerDelegate {
           }
         
       case .failure(let error):
-        debugPrint("Failed to send photo message")
+        debugPrint("Failed to send photo message \(error.localizedDescription)")
       }
     }
   }
@@ -357,7 +384,7 @@ extension ChatViewController: ChatPickerDelegate {
           name: item.name,
           newMessage: message) { [weak self] created in
             guard let self, created else {
-              debugPrint("Failed to send")
+              debugPrint("Failed to send video message")
               return
             }
             self.item.isNewConversation = false
@@ -368,7 +395,7 @@ extension ChatViewController: ChatPickerDelegate {
           }
         
       case .failure(let error):
-        debugPrint("Failed to send photo message")
+        debugPrint("Failed to send video message \(error.localizedDescription)")
       }
     }
   }
@@ -389,7 +416,7 @@ extension ChatViewController: ChatPickerDelegate {
       name: item.name,
       newMessage: message) { [weak self] created in
         guard let self, created else {
-          debugPrint("Failed to send")
+          debugPrint("Failed to send location message")
           return
         }
         self.item.isNewConversation = false

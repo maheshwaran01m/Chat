@@ -19,9 +19,9 @@ final class StorageManager {
   typealias UploadPictureCompletion = (Result<String, Error>) -> Void
   
   ///uploads picture to firebase storage and returns compeltion to url string to download
-  func uploadProfilePicture(with data: Data, fileName: String, completion: @escaping UploadPictureCompletion){
+  func uploadProfilePicture(with data: Data, fileName: String, completion: @escaping UploadPictureCompletion) {
     
-    storage.child("images/\(fileName)").putData(data, metadata: nil, completion: {[weak self] metadata, error in
+    storage.child("images/\(fileName)").putData(data, metadata: nil, completion: { [weak self] metadata, error in
       guard let strongSelf = self else {
         return
       }
@@ -44,8 +44,8 @@ final class StorageManager {
     })
   }
   
-  func uploadMessagePhoto(with data: Data,fileName: String, completion: @escaping UploadPictureCompletion){
-    storage.child("message_images/\(fileName)").putData(data, metadata: nil, completion: {[weak self] metadata, error in
+  func uploadMessagePhoto(with data: Data, fileName: String, completion: @escaping UploadPictureCompletion) {
+    storage.child("message_images/\(fileName)").putData(data, metadata: nil, completion: { [weak self] metadata, error in
       guard error == nil else{
         //failed
         print("failed to upload data to database")
@@ -66,8 +66,8 @@ final class StorageManager {
     
   }
   
-  func uploadMessageVideo(with fileurl: URL,fileName: String, completion: @escaping UploadPictureCompletion){
-    storage.child("message_videos/\(fileName)").putFile(from: fileurl, metadata: nil, completion: {[weak self] metadata, error in
+  func uploadMessageVideo(with fileurl: URL, fileName: String, completion: @escaping UploadPictureCompletion) {
+    storage.child("message_videos/\(fileName)").putFile(from: fileurl, metadata: nil, completion: { [weak self] metadata, error in
       guard error == nil else{
         print("failed to upload Video file  to firebase database")
         completion(.failure(StorageErrors.failedToUpload))
